@@ -231,7 +231,13 @@ export default function App() {
     return INITIAL_SISKEUDES_PAGU;
   });
 
-  const [activeRole, setActiveRole] = useState<UserRole>('PUBLIC');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    return localStorage.getItem('simonev_is_logged_in') === 'true';
+  });
+
+  const [activeRole, setActiveRole] = useState<UserRole>(() => {
+    return (localStorage.getItem('simonev_active_role') as UserRole) || 'PUBLIC';
+  });
   const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'OPERATOR_DESA' | 'EVALUASI_KECAMATAN' | 'INTEGRASI_SISKEUDES' | 'PORTAL_WARGA' | 'PERATURAN' | 'PANDUAN' | 'MONEV_BUMDES'>('DASHBOARD');
 
   const [bumdesMonevList, setBumdesMonevList] = useState<BumdesMonev[]>(() => {
@@ -951,6 +957,81 @@ export default function App() {
     }
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setActiveRole('PUBLIC');
+    localStorage.removeItem('simonev_is_logged_in');
+    localStorage.removeItem('simonev_active_role');
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <div id="simonev-auth-gateway" className="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col justify-between p-4 sm:p-6 relative overflow-y-auto font-sans">
+        {/* Background Radial Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-blue-600/10 blur-3xl pointer-events-none rounded-full" />
+        
+        {/* Top Header Logo Bar */}
+        <div className="max-w-md w-full mx-auto flex items-center justify-between z-10 pt-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-blue-600 rounded-xl shadow-lg border border-blue-400/30">
+              <Building2 className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold font-sans tracking-wide text-white">SIMONEV APBDES</h1>
+              <p className="text-[10px] text-slate-400 uppercase tracking-widest font-mono">Kecamatan Waru</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveRole('PUBLIC');
+              setIsLoggedIn(true);
+              setActiveTab('PORTAL_WARGA');
+              localStorage.setItem('simonev_is_logged_in', 'true');
+              localStorage.setItem('simonev_active_role', 'PUBLIC');
+            }}
+            className="text-xs font-bold text-blue-400 hover:text-blue-300 bg-blue-950/70 border border-blue-800/60 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+            title="Akses Publik Tanpa Login Operator"
+          >
+            <Eye className="w-3.5 h-3.5" /> Tamu Publik
+          </button>
+        </div>
+
+        {/* Center Card */}
+        <div className="my-auto py-8 z-10">
+          <div className="text-center max-w-md mx-auto mb-4 space-y-1">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Portal Gerbang Masuk SIMONEV</h2>
+            <p className="text-xs text-slate-400">Sistem Informasi Monitoring & Evaluasi APBDes Kecamatan Waru</p>
+          </div>
+
+          <LoginPortal
+            onLoginSuccess={(role) => {
+              setActiveRole(role);
+              setIsLoggedIn(true);
+              localStorage.setItem('simonev_is_logged_in', 'true');
+              localStorage.setItem('simonev_active_role', role);
+
+              if (role === 'OP_KECAMATAN') {
+                setActiveTab('EVALUASI_KECAMATAN');
+              } else if (role === 'OP_BANGUN_MULYA' || role === 'OP_SESULU' || role === 'OP_API_API') {
+                setActiveTab('OPERATOR_DESA');
+              } else {
+                setActiveTab('DASHBOARD');
+              }
+            }}
+            defaultRolePreference="OP_BANGUN_MULYA"
+          />
+        </div>
+
+        {/* Bottom Disclaimer */}
+        <div className="text-center text-[11px] text-slate-500 z-10 pb-2 font-mono">
+          © 2026 SIMONEV APBDES Kecamatan Waru. Melayani Desa Bangun Mulya, Desa Sesulu, dan Desa Api-api.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div id="simonev-apbdes-app" className="h-screen w-full bg-slate-50 font-sans text-slate-800 flex flex-col overflow-hidden antialiased">
       
@@ -1148,18 +1229,14 @@ export default function App() {
                   </p>
                 </div>
               </div>
-              {activeRole !== 'PUBLIC' && (
-                <button
-                  onClick={() => {
-                    setActiveRole('PUBLIC');
-                    setActiveTab('DASHBOARD');
-                  }}
-                  title="Keluar / Logout"
-                  className="p-1 px-2.5 rounded-lg text-slate-400 hover:bg-rose-950/80 hover:text-rose-450 border border-slate-850 hover:border-rose-950 transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
-              )}
+              <button
+                onClick={handleLogout}
+                title="Keluar / Logout dari Aplikasi"
+                className="p-1 px-2.5 rounded-lg text-rose-400 hover:bg-rose-950/80 hover:text-rose-300 border border-rose-900/60 transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold"
+              >
+                <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                <span>Keluar</span>
+              </button>
             </div>
           </div>
         </aside>
@@ -1221,19 +1298,24 @@ export default function App() {
               </select>
             </div>
 
-            <div className="flex items-center space-x-4 md:space-x-6">
-              <div className="text-right hidden sm:block">
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <div className="text-right hidden sm:block mr-2">
                 <p className="text-[9px] text-slate-400 uppercase font-bold leading-none">Terakhir Sinkronisasi</p>
                 <p className="text-xs font-bold text-slate-700 mt-1">Hari Ini, Real-time WIB</p>
               </div>
-              <span className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-[11px] font-semibold select-none">
-                <span>🔒</span> Untuk Akses Hubungi Tim Monev
-              </span>
               <button 
                 onClick={() => window.print()}
-                className="bg-blue-600 text-white px-3.5 py-1.5 md:py-2 rounded text-xs font-bold hover:bg-blue-700 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                className="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-700 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 Cetakan Laporan
+              </button>
+              <button 
+                onClick={handleLogout}
+                className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                title="Keluar dari Sistem SIMONEV"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Keluar</span>
               </button>
             </div>
           </header>
