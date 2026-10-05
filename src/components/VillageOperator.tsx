@@ -1278,68 +1278,68 @@ export default function VillageOperator({
                               )}
                             </span>
                             
-                            {/* 4 File slots for inline edit */}
-                            <div className="space-y-1.5">
-                              <span className="font-semibold text-[9px] text-slate-500 uppercase tracking-wider block">
-                                Laporan Realisasi Fisik (Maks. 4 Berkas: PDF / Docx / Xlsx / Foto)
-                              </span>
-                              <div className="grid grid-cols-4 gap-2">
-                                {[0, 1, 2, 3].map((idx) => {
-                                  const photo = editPhotos[idx];
-                                  return (
-                                    <div key={idx} className="relative group">
-                                      <input
-                                        type="file"
-                                        accept="image/*, application/pdf, .docx, .xlsx, .doc, .xls"
-                                        id={`edit-photo-${act.id}-${idx}`}
-                                        onChange={(e) => handlePhotoFileChange(e, true, idx)}
-                                        className="hidden"
-                                      />
-                                      {photo ? (
-                                        <div className="relative aspect-video rounded overflow-hidden border border-slate-300 bg-white shadow-xs">
-                                          {photo.startsWith('data:application/pdf') || photo.includes('.pdf') ? (
-                                            <div className="w-full h-full flex flex-col items-center justify-center bg-red-50 text-red-600 p-1 text-center text-[8px]">
-                                              <FileText className="w-4 h-4 text-red-500" />
-                                              <span className="truncate w-full font-bold">PDF</span>
-                                            </div>
-                                          ) : (
-                                            <img src={photo} alt={`Berkas Fisik ${idx + 1}`} className="w-full h-full object-cover" />
-                                          )}
-                                          <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <button
-                                              type="button"
-                                              onClick={() => {
-                                                setEditPhotos(prev => {
-                                                  const updated = [...prev];
-                                                  updated[idx] = '';
-                                                  return updated;
-                                                });
-                                              }}
-                                              className="bg-rose-600 hover:bg-rose-700 text-white p-1 rounded-full transition-colors cursor-pointer"
-                                              title="Hapus"
-                                            >
-                                              <X className="w-2.5 h-2.5" />
-                                            </button>
-                                          </div>
-                                          <div className="absolute bottom-0.5 left-0.5 bg-slate-900/75 text-white text-[7px] px-1 rounded font-medium">
-                                            F{idx + 1}
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <label
-                                          htmlFor={`edit-photo-${act.id}-${idx}`}
-                                          className="flex flex-col items-center justify-center aspect-video border border-slate-300 border-dashed rounded bg-white cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all text-center p-1 group"
+                            {/* Single Bar File picker for Realisasi Fisik */}
+                            <div className="space-y-1">
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*, application/pdf, .docx, .xlsx, .doc, .xls"
+                                id={`edit-photo-${act.id}`}
+                                onChange={(e) => handlePhotoFileChange(e, true, -1)}
+                                className="hidden"
+                              />
+                              <label 
+                                htmlFor={`edit-photo-${act.id}`}
+                                className="flex items-center justify-center gap-1.5 border border-dashed border-slate-300 rounded p-2 text-slate-600 bg-white cursor-pointer hover:bg-slate-50 transition-colors text-[11px] font-semibold text-center"
+                              >
+                                <FileText className="w-3.5 h-3.5 text-slate-400" />
+                                <span>
+                                  {isPhotoUploading 
+                                    ? 'Mengunggah...' 
+                                    : (editPhotos.filter(Boolean).length > 0 
+                                        ? `${editPhotos.filter(Boolean).length} Berkas Fisik Terunggah (Pilih untuk Tambah/Ganti)` 
+                                        : 'Pilih Berkas Laporan Realisasi Fisik (PDF / Docx / Xlsx / Foto)'
+                                      )
+                                  }
+                                </span>
+                              </label>
+
+                              {/* Badges for uploaded physical files */}
+                              {editPhotos.filter(Boolean).length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 pt-1">
+                                  {editPhotos.map((photo, pIdx) => {
+                                    if (!photo) return null;
+                                    const isPdf = photo.startsWith('data:application/pdf') || photo.includes('.pdf');
+                                    return (
+                                      <div key={pIdx} className="flex items-center gap-1 bg-white border border-slate-300 rounded px-2 py-0.5 text-[10px]">
+                                        {isPdf ? (
+                                          <FileText className="w-3 h-3 text-red-500 flex-shrink-0" />
+                                        ) : (
+                                          <img src={photo} alt={`Berkas ${pIdx + 1}`} className="w-4 h-4 object-cover rounded flex-shrink-0" />
+                                        )}
+                                        <span className="font-medium text-slate-700 max-w-[120px] truncate">Berkas {pIdx + 1}</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setEditPhotos(prev => {
+                                              const updated = [...prev];
+                                              updated[pIdx] = '';
+                                              return updated;
+                                            });
+                                          }}
+                                          className="text-slate-400 hover:text-rose-600 p-0.5 rounded cursor-pointer"
+                                          title="Hapus"
                                         >
-                                          <Camera className="w-4 h-4 text-slate-400 group-hover:text-blue-500 mb-0.5" />
-                                          <span className="text-[8px] text-slate-600 font-bold">Berkas {idx + 1}</span>
-                                        </label>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
+                                          <X className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
 
+                            {/* Single Bar File picker for Realisasi Keuangan */}
                             <div>
                               <input
                                 type="file"
@@ -1350,15 +1350,15 @@ export default function VillageOperator({
                               />
                               <label 
                                 htmlFor={`edit-report-${act.id}`}
-                                className="flex items-center gap-1 cursor-pointer bg-white border border-slate-300 p-1.5 rounded text-center font-bold text-slate-800 hover:bg-slate-100 justify-center"
+                                className="flex items-center justify-center gap-1.5 border border-dashed border-slate-300 rounded p-2 text-slate-600 bg-white cursor-pointer hover:bg-slate-50 transition-colors text-[11px] font-semibold text-center"
                               >
-                                <FileText className="w-3 text-slate-400" />
+                                <FileText className="w-3.5 h-3.5 text-slate-400" />
                                 <span>
                                   {isReportUploading 
                                     ? 'Mengunggah...' 
                                     : (editReportName 
-                                        ? `${editReportName.slice(0, 15)}... (Ganti)` 
-                                        : 'Unggah File Laporan SPJ (PDF/Foto)'
+                                        ? `${editReportName.slice(0, 20)}... (Ganti)` 
+                                        : 'Pilih Berkas Laporan Keuangan (PDF / Docx / Xlsx / Foto)'
                                       )
                                   }
                                 </span>
