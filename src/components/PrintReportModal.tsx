@@ -80,8 +80,10 @@ export default function PrintReportModal({
       const matchStatus = selectedStatus === 'ALL' 
         ? true 
         : selectedStatus === 'FISIK_100_BELUM_ACC'
-          ? (act.progressPhysical === 100 && !act.isKecamatanApproved)
-          : act.status === selectedStatus;
+          ? ((act.progressPhysical === 100 || act.status === 'SELESAI') && !act.isKecamatanApproved)
+          : selectedStatus === 'SELESAI'
+            ? (act.isKecamatanApproved === true)
+            : act.status === selectedStatus;
       const matchSource = selectedSource === 'ALL' || (act.sourceOfFunds || 'Dana Desa (DD)') === selectedSource;
       return matchVillage && matchSector && matchStatus && matchSource;
     });
@@ -270,7 +272,7 @@ export default function PrintReportModal({
               <option value="ALL">Semua Status Fisik</option>
               <option value="BELUM_MULAI">Belum Mulai</option>
               <option value="DALAM_PROSES">Dalam Proses</option>
-              <option value="SELESAI">Selesai</option>
+              <option value="SELESAI">Selesai (Sudah TTD / ACC PMD)</option>
               <option value="FISIK_100_BELUM_ACC">Fisik 100% Belum ACC/TTD</option>
             </select>
           </div>
