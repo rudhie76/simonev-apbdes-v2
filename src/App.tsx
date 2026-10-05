@@ -1000,10 +1000,14 @@ export default function App() {
         </div>
 
         {/* Center Card */}
-        <div className="my-auto py-8 z-10">
-          <div className="text-center max-w-md mx-auto mb-4 space-y-1">
-            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Portal Gerbang Masuk SIMONEV</h2>
-            <p className="text-xs text-slate-400">Sistem Informasi Monitoring & Evaluasi APBDes Kecamatan Waru</p>
+        <div className="my-auto py-6 z-10">
+          <div className="text-center max-w-lg mx-auto mb-5">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white leading-snug tracking-tight">
+              Sistem Informasi Monitoring & Evaluasi APBDes
+              <span className="block text-blue-400 font-bold text-lg sm:text-xl md:text-2xl mt-1">
+                Kecamatan Waru
+              </span>
+            </h2>
           </div>
 
           <LoginPortal

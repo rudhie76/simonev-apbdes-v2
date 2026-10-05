@@ -186,7 +186,7 @@ export default function LoginPortal({ onLoginSuccess, defaultRolePreference }: L
           </div>
           <div>
             <h2 className="text-lg font-bold tracking-tight">
-              {activeTab === 'LOGIN' ? 'Portal Pengaman SIMONEV' : 'Pendaftaran Akun Operator Baru'}
+              {activeTab === 'LOGIN' ? 'Autentikasi Akun Operator' : 'Pendaftaran Akun Operator Baru'}
             </h2>
             <p className="text-xs text-slate-400">
               {activeTab === 'LOGIN' 
