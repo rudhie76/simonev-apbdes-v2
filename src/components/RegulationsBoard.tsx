@@ -23,8 +23,7 @@ import {
   CloudOff,
   Check
 } from 'lucide-react';
-import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, onSnapshot, doc, setDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType, collection, onSnapshot, doc, setDoc, deleteDoc, getDocs } from '../lib/sheetsApi';
 import { Regulation, UserRole } from '../types';
 
 interface RegulationsBoardProps {

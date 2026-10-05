@@ -29,7 +29,7 @@ import {
   Camera
 } from 'lucide-react';
 import { handleDownloadFile, handleDownloadPhotoPdf } from '../lib/download';
-import { uploadFileToStorage } from '../lib/firebase';
+import { uploadFileToStorage } from '../lib/sheetsApi';
 
 // Client-side image compression helper
 const compressImageFile = (

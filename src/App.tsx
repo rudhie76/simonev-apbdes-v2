@@ -73,9 +73,13 @@ import {
   setDoc, 
   deleteDoc, 
   onSnapshot, 
-  getDocs 
-} from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from './lib/firebase';
+  getDocs,
+  db,
+  handleFirestoreError,
+  OperationType,
+  getScriptUrl,
+  setScriptUrl
+} from './lib/sheetsApi';
 
 // Helper to recursively remove undefined properties before writing to Cloud Firestore
 function cleanForFirestore(data: any): any {

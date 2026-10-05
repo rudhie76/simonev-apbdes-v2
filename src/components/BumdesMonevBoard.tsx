@@ -53,7 +53,7 @@ import {
   Download,
   Save
 } from 'lucide-react';
-import { uploadFileToStorage } from '../lib/firebase';
+import { uploadFileToStorage } from '../lib/sheetsApi';
 import { compressPdfFile } from '../lib/pdfCompressor';
 import { handleDownloadRktRabTemplate, handleDownloadRktRabReport } from '../lib/download';
 import PrintBumdesMonevModal from './PrintBumdesMonevModal';
