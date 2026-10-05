@@ -1028,14 +1028,14 @@ export default function VillageOperator({
                         </div>
                       </div>
 
-                      {/* Photo / report file preview if uploaded */}
+                      {/* Photo / report file preview side-by-side */}
                       <div className="flex flex-wrap gap-4 pt-2">
-                        {act.photoUrl && (
+                        {act.photoUrl ? (
                           <div className="flex flex-col gap-2 p-3 bg-slate-100 rounded-lg border border-slate-200 text-xs text-slate-700 w-full sm:w-auto">
                             <div className="flex items-center gap-1.5">
                               <ImageIcon className="w-4 h-4 text-slate-500" />
-                              <span className="font-semibold">
-                                Berkas Realisasi Fisik ({act.photoUrl.split(';').filter(Boolean).length} Berkas)
+                              <span className="font-bold text-slate-800">
+                                Dokumen Realisasi Fisik ({act.photoUrl.split(';').filter(Boolean).length} Berkas)
                               </span>
                             </div>
                             <div className="flex flex-wrap gap-2 mt-0.5">
@@ -1073,25 +1073,43 @@ export default function VillageOperator({
                               className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs whitespace-nowrap mt-1 justify-center"
                             >
                               <Download className="w-3.5 h-3.5" />
-                              Unduh Semua Berkas Realisasi Fisik
+                              Unduh Dokumen Realisasi Fisik
                             </button>
                           </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 p-3 bg-slate-100/70 rounded-lg border border-slate-200 text-xs text-slate-400">
+                            <AlertCircle className="w-4 h-4 text-slate-400" />
+                            <span>Belum ada Dokumen Realisasi Fisik</span>
+                          </div>
                         )}
-                        {act.budgetReportUrl && (
-                          <div className="flex flex-wrap items-center justify-between gap-3 p-2 bg-slate-100 rounded-lg border border-slate-200 text-xs text-slate-700 w-full sm:w-auto">
-                            <div className="flex items-center gap-2">
-                              <FileCheck className="w-4 h-4 text-slate-500" />
-                              <span className="font-mono truncate max-w-[150px] md:max-w-[200px]" title={act.budgetReportName || act.budgetReportUrl}>{act.budgetReportName || act.budgetReportUrl}</span>
+
+                        {act.budgetReportUrl ? (
+                          <div className="flex flex-col gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-xs text-emerald-900 w-full sm:w-auto">
+                            <div className="flex items-center gap-1.5">
+                              <FileText className="w-4 h-4 text-emerald-600" />
+                              <span className="font-bold text-slate-800">
+                                Dokumen Realisasi Keuangan
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="font-mono text-xs font-semibold text-slate-700 truncate max-w-[180px] md:max-w-[220px]" title={act.budgetReportName || act.budgetReportUrl}>
+                                {act.budgetReportName || act.budgetReportUrl}
+                              </span>
                             </div>
                             <button
                               type="button"
                               onClick={() => handleDownloadFile(act)}
-                              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-[10px] px-2 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer shadow-sm whitespace-nowrap"
-                              title="Unduh Berkas Syarat Evaluasi"
+                              className="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs whitespace-nowrap mt-1 justify-center"
+                              title="Unduh Dokumen Realisasi Keuangan"
                             >
                               <Download className="w-3.5 h-3.5" />
-                              Unduh Syarat Evaluasi
+                              Unduh Dokumen Realisasi Keuangan
                             </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 p-3 bg-slate-100/70 rounded-lg border border-slate-200 text-xs text-slate-400">
+                            <AlertCircle className="w-4 h-4 text-slate-400" />
+                            <span>Belum ada Dokumen Realisasi Keuangan</span>
                           </div>
                         )}
                       </div>
