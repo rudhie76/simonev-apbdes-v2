@@ -6,10 +6,14 @@
 import { Activity } from '../types';
 
 export function handleDownloadFile(activity: Activity) {
+  if (!activity.budgetReportUrl) return;
+
+  const url = activity.budgetReportUrl;
+
   // 1. Check if the budgetReportUrl is a Base64 data URL
-  if (activity.budgetReportUrl?.startsWith('data:')) {
+  if (url.startsWith('data:')) {
     try {
-      const dataUrl = activity.budgetReportUrl;
+      const dataUrl = url;
       const originalFilename = activity.budgetReportName || 'SYARAT_EVALUASI.pdf';
       
       // Split the metadata and content parts of the Base64 Data URL
@@ -25,22 +29,28 @@ export function handleDownloadFile(activity: Activity) {
         }
         
         const blob = new Blob([u8arr], { type: mimeType });
-        const url = URL.createObjectURL(blob);
+        const objectUrl = URL.createObjectURL(blob);
         
         const link = document.createElement('a');
-        link.href = url;
+        link.href = objectUrl;
         link.download = originalFilename;
         document.body.appendChild(link);
         link.click();
         
         // Cleanup
         document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(objectUrl);
         return;
       }
     } catch (e) {
       console.error("Gagal mendecode Base64 berkas, menggunakan fallback ringkasan teks", e);
     }
+  }
+
+  // 2. Check if the budgetReportUrl is a Web / Google Drive URL
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
   }
 
   // -------------------------------------------------------------
@@ -109,11 +119,11 @@ Catatan Sistem     : Berkas ini diunduh sebagai ringkasan karena belum diunggah 
 
   // Create text/plain blob for simulated file
   const blob = new Blob([docContent], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
+  const fallbackUrl = URL.createObjectURL(blob);
   
   // Trigger browser download workflow
   const link = document.createElement('a');
-  link.href = url;
+  link.href = fallbackUrl;
   link.download = filename;
   
   document.body.appendChild(link);
@@ -121,7 +131,7 @@ Catatan Sistem     : Berkas ini diunduh sebagai ringkasan karena belum diunggah 
   
   // Cleanup
   document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(fallbackUrl);
 }
 
 export function handleDownloadPhotoPdf(activity: Activity) {
@@ -164,8 +174,10 @@ export function handleDownloadPhotoPdf(activity: Activity) {
       } catch (e) {
         console.error("Gagal mendecode Base64 berkas bukti fisik", e);
       }
+    } else if (url.startsWith('http://') || url.startsWith('https://')) {
+      window.open(url, '_blank', 'noopener,noreferrer');
     } else {
-      // Fallback for relative paths or Unsplash templates
+      // Fallback for relative paths or local asset files
       const link = document.createElement('a');
       link.href = url;
       link.target = "_blank";

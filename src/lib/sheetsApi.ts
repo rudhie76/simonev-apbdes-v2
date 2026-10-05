@@ -150,8 +150,9 @@ export async function uploadFileToStorage(file: File, folderName: string): Promi
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = async () => {
+      const dataUrl = reader.result as string;
       try {
-        const base64Data = (reader.result as string).split(',')[1];
+        const base64Data = dataUrl.split(',')[1];
         const scriptUrl = getScriptUrl();
 
         const response = await fetch(scriptUrl, {
@@ -168,27 +169,32 @@ export async function uploadFileToStorage(file: File, folderName: string): Promi
           })
         });
 
-        const resJson = await response.json();
-        if (resJson.status === 'success' && resJson.fileUrl) {
-          resolve(resJson.fileUrl);
-        } else if (resJson.status === 'success' && resJson.fileId) {
-          resolve(`https://lh3.googleusercontent.com/d/${resJson.fileId}`);
-        } else {
-          const dataUrl = reader.result as string;
-          if (dataUrl.length <= 45000) {
-            resolve(dataUrl);
-          } else {
-            reject(new Error("Gagal mengunggah file ke Google Drive. Ukuran file terlalu besar."));
-          }
+        const resText = await response.text();
+        let resJson: any = {};
+        try {
+          resJson = JSON.parse(resText);
+        } catch (e) {
+          console.warn("Google Apps Script upload response was not JSON:", resText);
         }
+
+        const fileUrl = resJson.fileUrl || resJson.url || resJson.downloadUrl || resJson.webContentLink;
+        const fileId = resJson.fileId || resJson.id;
+        const isSuccess = resJson.status === 'success' || resJson.success === true || resJson.result === 'success' || Boolean(fileUrl || fileId);
+
+        if (isSuccess && fileUrl) {
+          resolve(fileUrl);
+          return;
+        }
+        if (isSuccess && fileId) {
+          resolve(`https://lh3.googleusercontent.com/d/${fileId}`);
+          return;
+        }
+
+        console.warn("Apps script upload did not return drive URL, using Base64 data URL fallback", resJson || resText);
+        resolve(dataUrl);
       } catch (err) {
-        console.warn("Upload to Google Drive via Apps Script failed:", err);
-        const dataUrl = reader.result as string;
-        if (dataUrl.length <= 45000) {
-          resolve(dataUrl);
-        } else {
-          reject(new Error("Upload ke Google Drive terputus. Pastikan koneksi internet stabil dan file < 5MB."));
-        }
+        console.warn("Upload to Google Drive via Apps Script failed, using Base64 data URL fallback:", err);
+        resolve(dataUrl);
       }
     };
     reader.onerror = (error) => reject(error);

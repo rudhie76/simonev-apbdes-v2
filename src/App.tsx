@@ -149,18 +149,8 @@ function safeSaveToLocalStorage(key: string, data: any) {
       const trimmed = data.slice(0, 30);
       localStorage.setItem(key, JSON.stringify(trimmed));
     } else if (key === 'simonev_activities' && Array.isArray(data)) {
-      // Strip out huge base64 strings from activities before saving to local storage
-      const cleaned = data.map(act => {
-        const cleanAct = { ...act };
-        if (cleanAct.photoUrl && cleanAct.photoUrl.startsWith('data:')) {
-          cleanAct.photoUrl = 'data:image/jpeg;base64,truncated'; // keep a tiny placeholder
-        }
-        if (cleanAct.budgetReportUrl && cleanAct.budgetReportUrl.startsWith('data:')) {
-          cleanAct.budgetReportUrl = 'data:application/pdf;base64,truncated'; // keep a tiny placeholder
-        }
-        return cleanAct;
-      });
-      localStorage.setItem(key, JSON.stringify(cleaned));
+      // Preserve activities data including document URLs intact
+      localStorage.setItem(key, JSON.stringify(data));
     } else if (key === 'simonev_bumdes' && Array.isArray(data)) {
       const cleaned = data.map(b => {
         const cleanB = { ...b };
