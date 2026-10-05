@@ -427,21 +427,27 @@ export default function KecamatanOperator({
                       {act.name}
                     </h4>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs font-semibold text-slate-500 pt-1">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-semibold text-slate-500 pt-1">
                       <div>
-                        <div className="text-slate-400 text-[10px] uppercase font-bold">Pagu Usulan</div>
+                        <div className="text-slate-400 text-[10px] uppercase font-bold">Pagu Anggaran</div>
                         <div className="text-sm font-bold text-slate-900 font-mono mt-0.5">{formatRupiah(act.budgetTotal)}</div>
                       </div>
                       <div>
-                        <div className="text-slate-400 text-[10px] uppercase font-bold">Realisasi Lap.</div>
+                        <div className="text-slate-400 text-[10px] uppercase font-bold">Realisasi Keuangan</div>
                         <div className="text-sm font-bold text-emerald-700 font-mono mt-0.5">
-                          {formatRupiah(act.budgetSpent)} ({absorptionPercent}%)
+                          {formatRupiah(act.budgetSpent)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-slate-400 text-[10px] uppercase font-bold">Status Fisik</div>
-                        <div className="text-sm font-bold text-slate-900 font-mono mt-0.5">
-                          {act.progressPhysical}% Rampung
+                        <div className="text-slate-400 text-[10px] uppercase font-bold">Realisasi Fisik</div>
+                        <div className="text-sm font-bold text-blue-700 font-mono mt-0.5">
+                          {act.progressPhysical}%
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 text-[10px] uppercase font-bold">Terakhir Diperbaharui</div>
+                        <div className="text-slate-700 font-mono mt-0.5">
+                          {new Date(act.lastUpdated).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: '2-digit' })}
                         </div>
                       </div>
                     </div>

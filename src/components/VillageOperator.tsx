@@ -625,7 +625,7 @@ export default function VillageOperator({
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-700 uppercase">Realisasi Anggaran Berjalan (IDR)</label>
+              <label className="block text-xs font-bold text-slate-700 uppercase">Realisasi Keuangan (IDR)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-slate-400 font-mono text-sm">Rp</span>
                 <input
@@ -1003,19 +1003,25 @@ export default function VillageOperator({
                         {act.name}
                       </h4>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs font-medium text-slate-500 pt-1">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-medium text-slate-500 pt-1">
                         <div>
                           <div className="text-slate-400 text-[10px] uppercase font-bold">Pagu Anggaran</div>
                           <div className="text-sm font-bold text-slate-900 font-mono mt-0.5">{formatRupiah(act.budgetTotal)}</div>
                         </div>
                         <div>
-                          <div className="text-slate-400 text-[10px] uppercase font-bold">Realisasi SPJ</div>
+                          <div className="text-slate-400 text-[10px] uppercase font-bold">Realisasi Keuangan</div>
                           <div className="text-sm font-bold text-emerald-700 font-mono mt-0.5">
                             {formatRupiah(act.budgetSpent)}
                           </div>
                         </div>
                         <div>
-                          <div className="text-slate-400 text-[10px] uppercase font-bold">Terakhir Diperbarui</div>
+                          <div className="text-slate-400 text-[10px] uppercase font-bold">Realisasi Fisik</div>
+                          <div className="text-sm font-bold text-blue-700 font-mono mt-0.5">
+                            {act.progressPhysical}%
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-slate-400 text-[10px] uppercase font-bold">Terakhir Diperbaharui</div>
                           <div className="text-slate-700 font-mono mt-0.5">
                             {new Date(act.lastUpdated).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: '2-digit' })}
                           </div>
@@ -1188,7 +1194,7 @@ export default function VillageOperator({
 
                           {/* Budget spent field input */}
                           <div className="space-y-1">
-                            <label className="text-[10px] font-bold text-slate-600 block">REALISASI ANGGARAN SPJ (IDR)</label>
+                            <label className="text-[10px] font-bold text-slate-600 block">REALISASI KEUANGAN (IDR)</label>
                             <input
                               type="number"
                               min={0}
