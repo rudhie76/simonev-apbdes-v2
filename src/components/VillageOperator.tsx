@@ -734,7 +734,7 @@ export default function VillageOperator({
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-700 uppercase">File Laporan Realisasi (PDF / Docx / Xlsx / Gambar)</label>
+              <label className="block text-xs font-bold text-slate-700 uppercase">File Laporan Realisasi Keuangan (PDF / Docx / Xlsx / Gambar)</label>
               <input
                 type="file"
                 accept=".pdf, .docx, .xlsx, image/*"
@@ -752,7 +752,7 @@ export default function VillageOperator({
                     ? 'Mengunggah ke Cloud Storage...' 
                     : (newReportName 
                         ? `${newReportName.slice(0, 20)}...` 
-                        : 'Pilih Berkas Laporan Angg. (PDF / Excel / Foto)'
+                        : 'Pilih Berkas Laporan Keuangan (PDF / Docx / Xlsx / Foto)'
                       )
                   }
                 </span>
