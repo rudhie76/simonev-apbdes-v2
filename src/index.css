@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Override body and html constraints so document flows naturally */
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Reset the application root */
+  #simonev-apbdes-app {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  /* Hide navigation, sidebar, and headers */
+  aside, 
+  header, 
+  footer,
+  #simonev-apbdes-app > div:not(.fixed),
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Make modal outer overlay static so it does not float or clip */
+  .fixed.inset-0 {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    z-index: 1 !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Make modal container scroll-free and shadow-free */
+  .fixed .bg-white.rounded-2xl {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* Prevent scrolling cropping within sub-containers */
+  .overflow-y-auto {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Ensure print layout matches page margins */
+  #print-area {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}

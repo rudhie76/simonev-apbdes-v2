@@ -1,0 +1,194 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\- ]+$');
+    }
+
+    function isNumeric(val) {
+      return val is int || val is float;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Helper to check for Activity entity shape and limits
+    function isValidActivity(data) {
+      return data.id is string
+        && data.name is string
+        && data.name.size() > 0
+        && data.name.size() <= 250
+        && data.village is string
+        && (data.village == 'Bangun Mulya' || data.village == 'Sesulu' || data.village == 'Api-api')
+        && data.sector is string
+        && (data.sector == 'Penyelenggaraan Pemerintahan' 
+            || data.sector == 'Pembangunan Desa (Infrastruktur)' 
+            || data.sector == 'Pembangunan Desa (Non Infrastruktur)' 
+            || data.sector == 'Pembinaan Kemasyarakatan' 
+            || data.sector == 'Pemberdayaan Masyarakat' 
+            || data.sector == 'Penanggulangan Bencana & Mendesak')
+        && isNumeric(data.budgetTotal)
+        && data.budgetTotal >= 0
+        && isNumeric(data.budgetSpent)
+        && data.budgetSpent >= 0
+        && data.budgetSpent <= data.budgetTotal
+        && isNumeric(data.progressPhysical)
+        && data.progressPhysical >= 0
+        && data.progressPhysical <= 100
+        && data.status is string
+        && (data.status == 'BELUM_MULAI' || data.status == 'DALAM_PROSES' || data.status == 'MENUNGGU_EVALUASI' || data.status == 'SELESAI')
+        && data.isKecamatanApproved is bool
+        && data.createdAt is string
+        && data.lastUpdated is string
+        && (!('photoUrl' in data) || data.photoUrl is string)
+        && (!('budgetReportUrl' in data) || data.budgetReportUrl is string)
+        && (!('recommendation' in data) || data.recommendation is string)
+        && (!('approvedBy' in data) || data.approvedBy is string)
+        && (!('approvedAt' in data) || data.approvedAt is string)
+        && (!('sourceOfFunds' in data) || data.sourceOfFunds is string)
+        && (!('incompleteReason' in data) || data.incompleteReason is string)
+        && (!('incompleteReasonsHistory' in data) || data.incompleteReasonsHistory is list)
+        && (!('recommendationsHistory' in data) || data.recommendationsHistory is list);
+    }
+
+    // Helper to check for Notification Log entity shape
+    function isValidLog(data) {
+      return data.id is string
+        && data.title is string
+        && data.title.size() > 0
+        && data.title.size() <= 100
+        && data.description is string
+        && data.description.size() > 0
+        && data.description.size() <= 1000
+        && data.timestamp is string
+        && data.type is string
+        && (data.type == 'info' || data.type == 'success' || data.type == 'warn' || data.type == 'approval')
+        && (!('village' in data) || data.village is string);
+    }
+
+    // Collection: Activities
+    match /activities/{activityId} {
+      allow read: if true;
+      
+      allow create: if isValidId(activityId) 
+        && isValidActivity(incoming())
+        && incoming().id == activityId
+        && incoming().progressPhysical >= 0
+        && incoming().progressPhysical <= 100;
+
+      allow update: if isValidId(activityId)
+        && isValidActivity(incoming())
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().village == existing().village
+        && (
+          // Terminal lock protection: check if existing state is already fully approved/ACC
+          existing().isKecamatanApproved == false 
+          || incoming().isKecamatanApproved == true // keep existing approval
+        );
+
+      allow delete: if isValidId(activityId);
+    }
+
+    // Collection: Notification Logs
+    match /logs/{logId} {
+      allow read: if true;
+      
+      allow create: if isValidId(logId)
+        && isValidLog(incoming())
+        && incoming().id == logId;
+        
+      allow update, delete: if false; // Logs are write-once audit trails
+    }
+
+    // Collection: Siskeudes Pagu (imported village APBDes budget ceiling)
+    match /siskeudes_pagu/{villageId} {
+      allow read: if true;
+      allow create, update: if isValidId(villageId)
+        && incoming().village == villageId
+        && isNumeric(incoming().paguTotal)
+        && incoming().lastSynced is string
+        && incoming().isSynced is bool;
+      allow delete: if false;
+    }
+
+    // Helper to check for Regulation entity shape
+    function isValidRegulation(data) {
+      return data.id is string
+        && data.category is string
+        && (data.category == 'PUSAT' || data.category == 'PROVINSI' || data.category == 'KABUPATEN')
+        && data.title is string
+        && data.title.size() > 0
+        && data.title.size() <= 400
+        && data.numberAndYear is string
+        && data.numberAndYear.size() > 0
+        && data.numberAndYear.size() <= 150
+        && data.topic is string
+        && data.topic.size() > 0
+        && data.topic.size() <= 200
+        && data.description is string
+        && data.description.size() > 0
+        && data.description.size() <= 3000
+        && data.publishDate is string
+        && data.publishDate.size() > 0
+        && data.publishDate.size() <= 100
+        && data.keyPoints is list
+        && data.downloadFilename is string
+        && data.downloadFilename.size() > 0
+        && data.downloadFilename.size() <= 150
+        && data.createdAt is string
+        && data.lastUpdated is string
+        && (!('referenceUrl' in data) || data.referenceUrl is string);
+    }
+
+    // Helper to check for BUMDes Monev entity shape
+    function isValidBumdesMonev(data) {
+      return data.id is string
+        && data.village is string
+        && (data.village == 'Bangun Mulya' || data.village == 'Sesulu' || data.village == 'Api-api')
+        && isNumeric(data.year)
+        && data.lastUpdated is string
+        && data.lawStatus is string
+        && (data.lawStatus == 'Sudah Terbit' || data.lawStatus == 'Proses Pendaftaran' || data.lawStatus == 'Belum')
+        && isNumeric(data.capitalParticipation)
+        && isNumeric(data.totalAssets)
+        && isNumeric(data.totalRevenue)
+        && isNumeric(data.netProfit)
+        && isNumeric(data.padesContribution)
+        && data.units is list
+        && isNumeric(data.totalEmployees)
+        && isNumeric(data.localEmployees)
+        && isNumeric(data.assistedUmkm);
+    }
+
+    // Collection: Regulations
+    match /regulations/{regulationId} {
+      allow read: if true;
+      allow create, update: if isValidId(regulationId)
+        && isValidRegulation(incoming())
+        && incoming().id == regulationId;
+      allow delete: if isValidId(regulationId);
+    }
+
+    // Collection: BUMDes Monev
+    match /bumdes_monev/{bumdesId} {
+      allow read: if true;
+      allow create, update: if isValidId(bumdesId)
+        && isValidBumdesMonev(incoming())
+        && incoming().id == bumdesId;
+      allow delete: if isValidId(bumdesId);
+    }
+  }
+}

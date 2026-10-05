@@ -1,0 +1,320 @@
+{
+  "entities": {
+    "activity": {
+      "title": "Activity",
+      "description": "Represents an APBDes real-time activity for a village under monitoring.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier of the activity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name or brief description of the progress work."
+        },
+        "village": {
+          "type": "string",
+          "enum": ["Bangun Mulya", "Sesulu", "Api-api"],
+          "description": "The village that manages and performs this activity."
+        },
+        "sector": {
+          "type": "string",
+          "enum": [
+            "Penyelenggaraan Pemerintahan",
+            "Pembangunan Desa (Infrastruktur)",
+            "Pembangunan Desa (Non Infrastruktur)",
+            "Pembinaan Kemasyarakatan",
+            "Pemberdayaan Masyarakat",
+            "Penanggulangan Bencana & Mendesak"
+          ],
+          "description": "The APBDes sector category for this activity."
+        },
+        "budgetTotal": {
+          "type": "number",
+          "description": "Total APBDes budget allocated for this activity."
+        },
+        "budgetSpent": {
+          "type": "number",
+          "description": "Total budget already spent/absorbed so far."
+        },
+        "progressPhysical": {
+          "type": "number",
+          "description": "Average physical/construction progress from 0 to 100."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["BELUM_MULAI", "DALAM_PROSES", "MENUNGGU_EVALUASI", "SELESAI"],
+          "description": "Current execution status of the activity."
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "Optional URL or Base64 data of physical progress photo."
+        },
+        "budgetReportUrl": {
+          "type": "string",
+          "description": "Optional reference or name of the uploaded budget absorption report."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "ISO timestamp indicating when the activity was last updated."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp indicating when the activity was registered."
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "Optional evaluation recommendation notes from Kecamatan verifier."
+        },
+        "isKecamatanApproved": {
+          "type": "boolean",
+          "description": "True if Kecamatan verifier has officially approved/ACC the activity."
+        },
+        "approvedBy": {
+          "type": "string",
+          "description": "The name of the PMD verifier who approved it."
+        },
+        "approvedAt": {
+          "type": "string",
+          "description": "ISO timestamp when approval was officially issued."
+        },
+        "recommendationsHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "officerName": { "type": "string" },
+              "timestamp": { "type": "string" },
+              "isApproved": { "type": "boolean" }
+            }
+          },
+          "description": "Historical list of evaluation recommendations from Kecamatan."
+        },
+        "incompleteReasonsHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "progressPhysical": { "type": "number" },
+              "timestamp": { "type": "string" }
+            }
+          },
+          "description": "Historical list of incomplete reasons provided by the village."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "village",
+        "sector",
+        "budgetTotal",
+        "budgetSpent",
+        "progressPhysical",
+        "status",
+        "lastUpdated",
+        "createdAt",
+        "isKecamatanApproved"
+      ]
+    },
+    "notificationLog": {
+      "title": "NotificationLog",
+      "description": "Audit trails and live activities log feed.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the log item."
+        },
+        "title": {
+          "type": "string",
+          "description": "Short log action title."
+        },
+        "description": {
+          "type": "string",
+          "description": "Narrative paragraph detailing the system activity."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "ISO timestamp of when the event occurred."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["info", "success", "warn", "approval"],
+          "description": "Visual weight/color styling type."
+        },
+        "village": {
+          "type": "string",
+          "enum": ["Bangun Mulya", "Sesulu", "Api-api"],
+          "description": "Optional village context for the notification log."
+        }
+      },
+      "required": ["id", "title", "description", "timestamp", "type"]
+    },
+    "siskeudesPagu": {
+      "title": "SiskeudesPagu",
+      "description": "Represents the imported Siskeudes APBDes budget ceiling for a village.",
+      "type": "object",
+      "properties": {
+        "village": {
+          "type": "string",
+          "enum": ["Bangun Mulya", "Sesulu", "Api-api"],
+          "description": "The name of the village."
+        },
+        "paguTotal": {
+          "type": "number",
+          "description": "Total APBDes budget ceiling imported."
+        },
+        "lastSynced": {
+          "type": "string",
+          "description": "ISO timestamp of the sync transaction."
+        },
+        "isSynced": {
+          "type": "boolean",
+          "description": "Set to true if retrieved from Siskeudes."
+        }
+      },
+      "required": ["village", "paguTotal", "lastSynced", "isSynced"]
+    },
+    "regulation": {
+      "title": "Regulation",
+      "description": "Represents a dynamic legal regulation (national, provincial, or local) governing village finance.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the regulation document."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["PUSAT", "PROVINSI", "KABUPATEN"],
+          "description": "Level or category of the regulation."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the regulation."
+        },
+        "numberAndYear": {
+          "type": "string",
+          "description": "Number and Year code of the regulation, e.g. UU No. 6/2014."
+        },
+        "topic": {
+          "type": "string",
+          "description": "Core legal topic of this regulation."
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description and explanation."
+        },
+        "publishDate": {
+          "type": "string",
+          "description": "Date of publication."
+        },
+        "keyPoints": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Bullet points summary of key instructions."
+        },
+        "referenceUrl": {
+          "type": "string",
+          "description": "Optional JDIH link or reference."
+        },
+        "downloadFilename": {
+          "type": "string",
+          "description": "Standard filename matching the reference."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp indicating when added to system."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "ISO timestamp indicating last update."
+        }
+      },
+      "required": ["id", "category", "title", "numberAndYear", "topic", "description", "publishDate", "keyPoints", "downloadFilename", "createdAt", "lastUpdated"]
+    },
+    "bumdesMonev": {
+      "title": "BumdesMonev",
+      "description": "Represents the Monitoring and Evaluation data for a Village-Owned Enterprise (BUMDes).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "village": { "type": "string", "enum": ["Bangun Mulya", "Sesulu", "Api-api"] },
+        "year": { "type": "number" },
+        "lastUpdated": { "type": "string" },
+        "updatedBy": { "type": "string" },
+        "lawStatus": { "type": "string", "enum": ["Sudah Terbit", "Proses Pendaftaran", "Belum"] },
+        "certificatePdfName": { "type": "string" },
+        "certificatePdfUrl": { "type": "string" },
+        "hasPerdesPendirian": { "type": "boolean" },
+        "perdesPdfName": { "type": "string" },
+        "perdesPdfUrl": { "type": "string" },
+        "hasAdArt": { "type": "boolean" },
+        "adArtPdfName": { "type": "string" },
+        "adArtPdfUrl": { "type": "string" },
+        "hasSkPengelola": { "type": "boolean" },
+        "skPengelolaPdfName": { "type": "string" },
+        "skPengelolaPdfUrl": { "type": "string" },
+        "musdesDate": { "type": "string" },
+        "musdesBaPdfName": { "type": "string" },
+        "musdesBaPdfUrl": { "type": "string" },
+        "musdesPhotoName": { "type": "string" },
+        "musdesPhotoUrl": { "type": "string" },
+        "capitalParticipation": { "type": "number" },
+        "totalAssets": { "type": "number" },
+        "totalRevenue": { "type": "number" },
+        "netProfit": { "type": "number" },
+        "padesContribution": { "type": "number" },
+        "units": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "status": { "type": "string" },
+              "financialCondition": { "type": "string" },
+              "mainConstraint": { "type": "string" }
+            }
+          }
+        },
+        "totalEmployees": { "type": "number" },
+        "localEmployees": { "type": "number" },
+        "assistedUmkm": { "type": "number" },
+        "verificationNotes": { "type": "string" },
+        "healthScore": { "type": "string", "enum": ["Sehat/Berkembang", "Tumbuh", "Dasar/Perlu Perhatian", "Sakit/Mangkrak"] },
+        "followUpRecommendation": { "type": "string" },
+        "reviewedBy": { "type": "string" },
+        "reviewedAt": { "type": "string" }
+      },
+      "required": ["id", "village", "year", "lastUpdated", "lawStatus"]
+    }
+  },
+  "firestore": {
+    "/activities/{activityId}": {
+      "schema": "activity",
+      "description": "Universal village real-time activities list."
+    },
+    "/logs/{logId}": {
+      "schema": "notificationLog",
+      "description": "Public audit trail log entries."
+    },
+    "/siskeudes_pagu/{villageId}": {
+      "schema": "siskeudesPagu",
+      "description": "Stores village APBDes budget pagu imported from Siskeudes."
+    },
+    "/regulations/{regulationId}": {
+      "schema": "regulation",
+      "description": "Collection of legal regulations governing village finance."
+    },
+    "/bumdes_monev/{bumdesId}": {
+      "schema": "bumdesMonev",
+      "description": "Collection of BUMDes Monitoring and Evaluation records."
+    }
+  }
+}

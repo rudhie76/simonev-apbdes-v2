@@ -1,0 +1,6 @@
+{
+  "name": "Simonev APBDes Waru",
+  "description": "Sistem Informasi Monitoring dan Evaluasi APBDes Kecamatan Waru untuk transparansi realisasi kegiatan, penyerapan anggaran, dan progres fisik Desa Bangun Mulya, Sesulu, dan Api-api.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
