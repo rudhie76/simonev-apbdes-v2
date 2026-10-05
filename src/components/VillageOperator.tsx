@@ -664,14 +664,14 @@ export default function VillageOperator({
               </div>
             )}
 
-            {/* 4 Photo upload slots for Dokumen Ceklist */}
+            {/* 4 File upload slots for Laporan Realisasi Fisik */}
             <div className="space-y-3 md:col-span-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
               <div className="flex flex-col gap-0.5">
                 <label className="block text-xs font-bold text-slate-700 uppercase">
-                  Dokumen Ceklist (Harap Masukkan 4 Foto Ceklist)
+                  Dokumen Laporan Realisasi Fisik (PDF / Docx / Xlsx / Gambar - Maks. 4 Berkas)
                 </label>
                 <span className="text-[10px] text-slate-500 font-normal">
-                  4 foto ceklist yang diupload baik langsung dari kamera atau penyimpanan di HP, langsung terkompres jika melebihi kapasitas
+                  Unggah 4 berkas Laporan Realisasi Fisik berupa PDF, Word (.docx), Excel (.xlsx), atau Gambar/Foto fisik dari kamera & galeri HP.
                 </span>
               </div>
               
@@ -682,7 +682,7 @@ export default function VillageOperator({
                     <div key={idx} className="relative group">
                       <input
                         type="file"
-                        accept="image/*, application/pdf"
+                        accept="image/*, application/pdf, .docx, .xlsx, .doc, .xls"
                         id={`add-photo-file-${idx}`}
                         onChange={(e) => handlePhotoFileChange(e, false, idx)}
                         className="hidden"
@@ -692,10 +692,10 @@ export default function VillageOperator({
                           {photo.startsWith('data:application/pdf') || photo.includes('.pdf') ? (
                             <div className="w-full h-full flex flex-col items-center justify-center bg-red-50 text-red-600 p-2 text-center text-[10px]">
                               <FileText className="w-6 h-6 mb-1 text-red-500" />
-                              <span className="font-semibold truncate w-full">PDF Ceklist</span>
+                              <span className="font-semibold truncate w-full">PDF Berkas</span>
                             </div>
                           ) : (
-                            <img src={photo} alt={`Foto Ceklist ${idx + 1}`} className="w-full h-full object-cover" />
+                            <img src={photo} alt={`Berkas Fisik ${idx + 1}`} className="w-full h-full object-cover" />
                           )}
                           <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <button
@@ -723,8 +723,8 @@ export default function VillageOperator({
                           className="flex flex-col items-center justify-center aspect-video border border-slate-300 border-dashed rounded-lg bg-white cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all text-center p-2 group"
                         >
                           <Camera className="w-5 h-5 text-slate-400 group-hover:text-blue-500 mb-1" />
-                          <span className="text-[10px] text-slate-600 font-semibold">Foto Ceklist {idx + 1}</span>
-                          <span className="text-[8px] text-slate-400">Kamera / Galeri</span>
+                          <span className="text-[10px] text-slate-600 font-semibold">Berkas Fisik {idx + 1}</span>
+                          <span className="text-[8px] text-slate-400">PDF / Docx / Xlsx / Foto</span>
                         </label>
                       )}
                     </div>
@@ -1027,7 +1027,7 @@ export default function VillageOperator({
                             <div className="flex items-center gap-1.5">
                               <ImageIcon className="w-4 h-4 text-slate-500" />
                               <span className="font-semibold">
-                                Dokumen Ceklist ({act.photoUrl.split(';').filter(Boolean).length} Berkas)
+                                Berkas Realisasi Fisik ({act.photoUrl.split(';').filter(Boolean).length} Berkas)
                               </span>
                             </div>
                             <div className="flex flex-wrap gap-2 mt-0.5">
@@ -1039,7 +1039,7 @@ export default function VillageOperator({
                                       <div 
                                         onClick={() => handleDownloadPhotoPdf({ ...act, photoUrl: photo })}
                                         className="w-10 h-10 flex flex-col items-center justify-center bg-red-50 text-red-600 rounded border border-slate-300 p-1 text-[8px] font-bold cursor-pointer hover:bg-red-100 transition-colors"
-                                        title="Unduh / Lihat PDF"
+                                        title="Unduh / Lihat File PDF"
                                       >
                                         <FileText className="w-5 h-5 text-red-500" />
                                         <span>PDF</span>
@@ -1047,12 +1047,12 @@ export default function VillageOperator({
                                     ) : (
                                       <img 
                                         src={photo} 
-                                        alt={`Dokumen Ceklist ${pIdx + 1}`} 
+                                        alt={`Berkas Realisasi Fisik ${pIdx + 1}`} 
                                         className="w-10 h-10 object-cover rounded border border-slate-300 hover:scale-105 transition-transform cursor-pointer" 
                                         onClick={() => {
                                           handleDownloadPhotoPdf({ ...act, photoUrl: photo });
                                         }}
-                                        title={`Klik untuk unduh/lihat Foto Ceklist ${pIdx + 1}`}
+                                        title={`Klik untuk unduh/lihat Berkas Realisasi Fisik ${pIdx + 1}`}
                                       />
                                     )}
                                   </div>
@@ -1065,7 +1065,7 @@ export default function VillageOperator({
                               className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs whitespace-nowrap mt-1 justify-center"
                             >
                               <Download className="w-3.5 h-3.5" />
-                              Unduh Semua Dokumen Ceklist
+                              Unduh Semua Berkas Realisasi Fisik
                             </button>
                           </div>
                         )}
@@ -1276,10 +1276,10 @@ export default function VillageOperator({
                               )}
                             </span>
                             
-                            {/* 4 Photo slots for inline edit */}
+                            {/* 4 File slots for inline edit */}
                             <div className="space-y-1.5">
                               <span className="font-semibold text-[9px] text-slate-500 uppercase tracking-wider block">
-                                Dokumen Ceklist (Maks. 4 Foto Ceklist)
+                                Laporan Realisasi Fisik (Maks. 4 Berkas: PDF / Docx / Xlsx / Foto)
                               </span>
                               <div className="grid grid-cols-4 gap-2">
                                 {[0, 1, 2, 3].map((idx) => {
@@ -1288,7 +1288,7 @@ export default function VillageOperator({
                                     <div key={idx} className="relative group">
                                       <input
                                         type="file"
-                                        accept="image/*, application/pdf"
+                                        accept="image/*, application/pdf, .docx, .xlsx, .doc, .xls"
                                         id={`edit-photo-${act.id}-${idx}`}
                                         onChange={(e) => handlePhotoFileChange(e, true, idx)}
                                         className="hidden"
@@ -1301,7 +1301,7 @@ export default function VillageOperator({
                                               <span className="truncate w-full font-bold">PDF</span>
                                             </div>
                                           ) : (
-                                            <img src={photo} alt={`Foto Ceklist ${idx + 1}`} className="w-full h-full object-cover" />
+                                            <img src={photo} alt={`Berkas Fisik ${idx + 1}`} className="w-full h-full object-cover" />
                                           )}
                                           <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <button
@@ -1329,7 +1329,7 @@ export default function VillageOperator({
                                           className="flex flex-col items-center justify-center aspect-video border border-slate-300 border-dashed rounded bg-white cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all text-center p-1 group"
                                         >
                                           <Camera className="w-4 h-4 text-slate-400 group-hover:text-blue-500 mb-0.5" />
-                                          <span className="text-[8px] text-slate-600 font-bold">Foto Ceklist {idx + 1}</span>
+                                          <span className="text-[8px] text-slate-600 font-bold">Berkas {idx + 1}</span>
                                         </label>
                                       )}
                                     </div>
