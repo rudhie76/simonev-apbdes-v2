@@ -2679,30 +2679,7 @@ export default function BumdesMonevBoard({
           )}
         </div>
 
-        {/* Sticky Floating Save Bar for quick access */}
-        {(canEditVillageModules || canEditReviewerModule) && (
-          <div className="sticky bottom-4 z-40 bg-slate-900/95 backdrop-blur-md text-white p-3.5 px-6 rounded-2xl shadow-2xl border border-slate-700/80 flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-3 duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
-              <div>
-                <span className="text-xs font-extrabold text-slate-100 block">
-                  Pembaruan Monev Desa {selectedVillage} ({selectedYear})
-                </span>
-                <p className="text-[10px] text-slate-350">
-                  Data & file yang diunggah tersimpan otomatis. Gunakan tombol simpan di tiap modul atau tombol simpan utama.
-                </p>
-              </div>
-            </div>
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2.5 px-6 rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all cursor-pointer whitespace-nowrap active:scale-95"
-            >
-              <Save className="w-4 h-4" />
-              {isSaving ? 'Menyimpan...' : 'Simpan Semua Perubahan Monev'}
-            </button>
-          </div>
-        )}
+
 
         {/* Feedback Messages */}
         {saveSuccess && (
