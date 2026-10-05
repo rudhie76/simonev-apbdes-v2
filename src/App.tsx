@@ -33,6 +33,7 @@ import LoginPortal from './components/LoginPortal';
 import PrintReportModal from './components/PrintReportModal';
 import PrintProposalModal from './components/PrintProposalModal';
 import BumdesMonevBoard from './components/BumdesMonevBoard';
+import logoPpu from './assets/logo.png';
 
 // Icons
 import { 
@@ -973,8 +974,8 @@ export default function App() {
         {/* Top Header Logo Bar */}
         <div className="max-w-md w-full mx-auto flex items-center justify-between z-10 pt-2">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-blue-600 rounded-xl shadow-lg border border-blue-400/30">
-              <Building2 className="w-6 h-6 text-white" />
+            <div className="p-1.5 bg-white/10 rounded-xl shadow-lg border border-white/20 shrink-0">
+              <img src={logoPpu} alt="Logo Penajam Paser Utara" className="w-8 h-8 object-contain drop-shadow-sm" />
             </div>
             <div>
               <h1 className="text-lg font-bold font-sans tracking-wide text-white">SIMONEV APBDES</h1>
@@ -1093,9 +1094,9 @@ export default function App() {
         {/* Desktop Left Sidebar (Matches the brand-new Professional Polish aspect precisely) */}
         <aside className="w-64 bg-slate-900 text-white flex flex-col hidden md:flex shrink-0">
           <div className="p-6 border-b border-slate-850">
-            <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-blue-500" />
-              Simonev APBDes
+            <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2.5">
+              <img src={logoPpu} alt="Logo Penajam Paser Utara" className="w-7 h-7 object-contain shrink-0" />
+              <span>Simonev APBDes</span>
             </h1>
             <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-semibold font-mono">Kecamatan Waru</p>
           </div>

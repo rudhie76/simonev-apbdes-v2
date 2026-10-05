@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserRole } from '../types';
 import { Lock, ShieldAlert, Key, UserPlus, LogIn, CheckCircle2, AlertCircle, Eye, EyeOff, User, Phone } from 'lucide-react';
+import logoPpu from '../assets/logo.png';
 
 // Credential dictionary for default system accounts
 export const OPERATOR_CREDENTIALS = {
@@ -180,8 +181,8 @@ export default function LoginPortal({ onLoginSuccess, defaultRolePreference }: L
       {/* Header Banner */}
       <div className="bg-slate-900 text-white p-6 relative">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
-            {activeTab === 'LOGIN' ? <Lock className="w-5 h-5 text-white" /> : <UserPlus className="w-5 h-5 text-white" />}
+          <div className="w-11 h-11 bg-white/10 p-1 rounded-xl flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
+            <img src={logoPpu} alt="Logo Penajam Paser Utara" className="w-9 h-9 object-contain drop-shadow-sm" />
           </div>
           <div>
             <h2 className="text-lg font-bold tracking-tight">
