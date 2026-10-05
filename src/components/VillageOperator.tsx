@@ -139,6 +139,35 @@ export const SOURCES_OF_FUNDS: SourceOfFunds[] = [
   'Sisa Lebih Perhitungan Anggaran (SiLPA)'
 ];
 
+function SafeThumbnail({ photo, title, onClick }: { photo: string; title: string; onClick: () => void }) {
+  const [hasError, setHasError] = useState(false);
+  const isPdf = photo.startsWith('data:application/pdf') || photo.includes('.pdf') || photo.includes('application/pdf');
+
+  if (isPdf || hasError) {
+    return (
+      <div 
+        onClick={onClick}
+        className="w-10 h-10 flex flex-col items-center justify-center bg-red-50 hover:bg-red-100 transition-colors text-red-600 rounded border border-red-200 p-1 text-[8px] font-bold cursor-pointer shrink-0"
+        title={title}
+      >
+        <FileText className="w-5 h-5 text-red-500" />
+        <span className="truncate w-full text-center">PDF/File</span>
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={photo} 
+      alt="Berkas Realisasi" 
+      className="w-10 h-10 object-cover rounded border border-slate-300 hover:scale-105 transition-transform cursor-pointer shrink-0" 
+      onClick={onClick}
+      onError={() => setHasError(true)}
+      title={title}
+    />
+  );
+}
+
 export default function VillageOperator({ 
   village, 
   activities, 
@@ -1039,33 +1068,14 @@ export default function VillageOperator({
                               </span>
                             </div>
                             <div className="flex flex-wrap gap-2 mt-0.5">
-                              {act.photoUrl.split(';').filter(Boolean).map((photo, pIdx) => {
-                                const isPdf = photo.startsWith('data:application/pdf') || photo.includes('.pdf');
-                                return (
-                                  <div key={pIdx} className="relative group/thumb">
-                                    {isPdf ? (
-                                      <div 
-                                        onClick={() => handleDownloadPhotoPdf({ ...act, photoUrl: photo })}
-                                        className="w-10 h-10 flex flex-col items-center justify-center bg-red-50 text-red-600 rounded border border-slate-300 p-1 text-[8px] font-bold cursor-pointer hover:bg-red-100 transition-colors"
-                                        title="Unduh / Lihat File PDF"
-                                      >
-                                        <FileText className="w-5 h-5 text-red-500" />
-                                        <span>PDF</span>
-                                      </div>
-                                    ) : (
-                                      <img 
-                                        src={photo} 
-                                        alt={`Berkas Realisasi Fisik ${pIdx + 1}`} 
-                                        className="w-10 h-10 object-cover rounded border border-slate-300 hover:scale-105 transition-transform cursor-pointer" 
-                                        onClick={() => {
-                                          handleDownloadPhotoPdf({ ...act, photoUrl: photo });
-                                        }}
-                                        title={`Klik untuk unduh/lihat Berkas Realisasi Fisik ${pIdx + 1}`}
-                                      />
-                                    )}
-                                  </div>
-                                );
-                              })}
+                              {act.photoUrl.split(';').filter(Boolean).map((photo, pIdx) => (
+                                <SafeThumbnail 
+                                  key={pIdx} 
+                                  photo={photo} 
+                                  title={`Klik untuk unduh/lihat Berkas Realisasi Fisik ${pIdx + 1}`}
+                                  onClick={() => handleDownloadPhotoPdf({ ...act, photoUrl: photo })}
+                                />
+                              ))}
                             </div>
                             <button
                               type="button"

@@ -34,6 +34,36 @@ interface KecamatanOperatorProps {
   onTriggerPrintProposal?: () => void;
 }
 
+function SafeThumbnail({ photo, title, onClick }: { photo: string; title: string; onClick: () => void }) {
+  const [hasError, setHasError] = useState(false);
+  const isPdf = photo.startsWith('data:application/pdf') || photo.includes('.pdf') || photo.includes('application/pdf');
+
+  if (isPdf || hasError) {
+    return (
+      <button 
+        type="button"
+        onClick={onClick}
+        className="w-10 h-10 flex flex-col items-center justify-center bg-red-50 hover:bg-red-100 transition-colors text-red-600 rounded border border-red-200 p-1 text-[8px] font-bold cursor-pointer shrink-0"
+        title={title}
+      >
+        <FileText className="w-5 h-5 text-red-500" />
+        <span className="truncate w-full text-center">PDF/File</span>
+      </button>
+    );
+  }
+
+  return (
+    <img 
+      src={photo} 
+      alt="Berkas Realisasi" 
+      className="w-10 h-10 object-cover rounded border border-slate-300 hover:scale-105 transition-transform cursor-pointer shrink-0" 
+      onClick={onClick}
+      onError={() => setHasError(true)}
+      title={title}
+    />
+  );
+}
+
 export default function KecamatanOperator({ 
   activities, 
   onSetEvaluation,
@@ -463,32 +493,14 @@ export default function KecamatanOperator({
                             </span>
                           </div>
                           <div className="flex flex-wrap gap-2 mt-0.5">
-                            {act.photoUrl.split(';').filter(Boolean).map((photo, pIdx) => {
-                              const isPdf = photo.startsWith('data:application/pdf') || photo.includes('.pdf');
-                              return (
-                                <div key={pIdx} className="relative group/thumb">
-                                  {isPdf ? (
-                                    <button 
-                                      type="button" 
-                                      onClick={() => handleDownloadPhotoPdf({ ...act, photoUrl: photo })}
-                                      className="w-10 h-10 flex flex-col items-center justify-center bg-red-50 hover:bg-red-100 transition-colors text-red-600 rounded border border-red-200 p-1 text-[8px] font-bold"
-                                      title="Unduh / Lihat PDF"
-                                    >
-                                      <FileText className="w-5 h-5 text-red-500" />
-                                      <span>PDF</span>
-                                    </button>
-                                  ) : (
-                                    <img 
-                                      src={photo} 
-                                      alt={`File Realisasi ${pIdx + 1}`} 
-                                      className="w-10 h-10 object-cover rounded border border-slate-300 hover:scale-105 hover:border-blue-500 transition-all cursor-pointer" 
-                                      onClick={() => setPreviewPhoto(photo)}
-                                      title="Klik untuk Perbesar Foto"
-                                    />
-                                  )}
-                                </div>
-                              );
-                            })}
+                            {act.photoUrl.split(';').filter(Boolean).map((photo, pIdx) => (
+                              <SafeThumbnail 
+                                key={pIdx} 
+                                photo={photo} 
+                                title={`Klik untuk unduh/lihat Berkas Realisasi Fisik ${pIdx + 1}`}
+                                onClick={() => setPreviewPhoto(photo)}
+                              />
+                            ))}
                           </div>
                           <button
                             type="button"

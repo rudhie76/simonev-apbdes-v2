@@ -162,7 +162,7 @@ export async function uploadFileToStorage(file: File, folderName: string): Promi
           body: JSON.stringify({
             action: 'upload',
             folder: 'Database_Simonev_Uploads',
-            fileName: `${folderName}_${Date.now()}_${file.name}`,
+            fileName: `${folderName}_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9_.-]/g, '_')}`,
             mimeType: file.type || 'application/pdf',
             base64Data: base64Data
           })
@@ -174,11 +174,21 @@ export async function uploadFileToStorage(file: File, folderName: string): Promi
         } else if (resJson.status === 'success' && resJson.fileId) {
           resolve(`https://lh3.googleusercontent.com/d/${resJson.fileId}`);
         } else {
-          resolve(reader.result as string);
+          const dataUrl = reader.result as string;
+          if (dataUrl.length <= 45000) {
+            resolve(dataUrl);
+          } else {
+            reject(new Error("Gagal mengunggah file ke Google Drive. Ukuran file terlalu besar."));
+          }
         }
       } catch (err) {
-        console.warn("Upload to Google Drive via Apps Script failed, fallback to Data URL:", err);
-        resolve(reader.result as string);
+        console.warn("Upload to Google Drive via Apps Script failed:", err);
+        const dataUrl = reader.result as string;
+        if (dataUrl.length <= 45000) {
+          resolve(dataUrl);
+        } else {
+          reject(new Error("Upload ke Google Drive terputus. Pastikan koneksi internet stabil dan file < 5MB."));
+        }
       }
     };
     reader.onerror = (error) => reject(error);
