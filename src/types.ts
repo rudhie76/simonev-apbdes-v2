@@ -55,6 +55,7 @@ export interface Activity {
   status: ActivityStatus;
   sourceOfFunds?: SourceOfFunds;
   photoUrl?: string; // Base64 or template placeholder
+  photoName?: string; // Original filename of the physical realization document
   budgetReportUrl?: string; // Base64 or simulation name
   budgetReportName?: string; // Original filename of the budget report
   lastUpdated: string;

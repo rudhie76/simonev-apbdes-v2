@@ -487,25 +487,31 @@ export default function KecamatanOperator({
                       {act.photoUrl ? (
                         <div className="flex flex-col gap-2 p-3 bg-slate-100 rounded-lg border border-slate-200 text-xs text-slate-700 w-full sm:w-auto">
                           <div className="flex items-center gap-1.5">
-                            <ImageIcon className="w-4 h-4 text-slate-500" />
+                            <FileText className="w-4 h-4 text-blue-600" />
                             <span className="font-bold text-slate-800">
-                              Dokumen Realisasi Fisik ({act.photoUrl.split(';').filter(Boolean).length} Berkas)
+                              Dokumen Realisasi Fisik
                             </span>
                           </div>
-                          <div className="flex flex-wrap gap-2 mt-0.5">
-                            {act.photoUrl.split(';').filter(Boolean).map((photo, pIdx) => (
-                              <SafeThumbnail 
-                                key={pIdx} 
-                                photo={photo} 
-                                title={`Klik untuk unduh/lihat Berkas Realisasi Fisik ${pIdx + 1}`}
-                                onClick={() => setPreviewPhoto(photo)}
-                              />
-                            ))}
+                          <div className="flex flex-col gap-1 mt-0.5">
+                            {act.photoUrl.split(';').filter(Boolean).map((photo, pIdx) => {
+                              const fileCount = act.photoUrl!.split(';').filter(Boolean).length;
+                              const nameSuffix = fileCount > 1 ? `_${pIdx + 1}` : '';
+                              const isPdf = photo.includes('.pdf') || photo.startsWith('data:application/pdf') || photo.includes('googleusercontent') || photo.includes('drive.google');
+                              const ext = isPdf ? '.pdf' : '.png';
+                              const fileName = act.photoName || `Dokumen_Realisasi_Fisik${nameSuffix}${ext}`;
+
+                              return (
+                                <span key={pIdx} className="font-mono text-xs font-semibold text-slate-700 truncate max-w-[180px] md:max-w-[220px]" title={fileName}>
+                                  {fileName}
+                                </span>
+                              );
+                            })}
                           </div>
                           <button
                             type="button"
                             onClick={() => handleDownloadPhotoPdf(act)}
                             className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs whitespace-nowrap mt-1 justify-center"
+                            title="Unduh Dokumen Realisasi Fisik"
                           >
                             <Download className="w-3.5 h-3.5" />
                             <span>Unduh Dokumen Realisasi Fisik</span>
