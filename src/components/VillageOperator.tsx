@@ -229,76 +229,85 @@ export default function VillageOperator({
     return { totalCount, completedCount, waitingEvaluasiCount, inProcessCount, approvedCount, currentSpent, totalPagu };
   }, [villageActivities]);
 
-  // Handle Photo input (Firebase Cloud Storage Upload with Base64 fallback for small files)
-  const handlePhotoFileChange = async (e: React.ChangeEvent<HTMLInputElement>, isEditMode: boolean, index: number) => {
-    let file = e.target.files?.[0];
-    if (file) {
-      setCompressionFeedback(null);
-      
-      // Compress if it is an image exceeding 1MB (1,048,576 bytes)
-      if (file.type.startsWith('image/') && file.size > 1 * 1024 * 1024) {
-        setIsPhotoUploading(true);
-        try {
-          file = await compressImageFile(file, (info) => {
-            setCompressionFeedback(info);
-          });
-        } catch (err) {
-          console.error("Image compression error:", err);
-        }
-      }
+  // Handle Photo / Physical Realisasi File input (Firebase Cloud Storage Upload with Base64 fallback)
+  const handlePhotoFileChange = async (e: React.ChangeEvent<HTMLInputElement>, isEditMode: boolean, index: number = -1) => {
+    const rawFiles = e.target.files;
+    if (!rawFiles || rawFiles.length === 0) return;
 
-      if (file.size > 15 * 1024 * 1024) {
-        alert('Ukuran berkas melebihi batas (Maks. 15MB)');
-        setIsPhotoUploading(false);
-        return;
-      }
-      
-      setIsPhotoUploading(true);
-      try {
-        const downloadUrl = await uploadFileToStorage(file, 'photos');
-        if (isEditMode) {
-          setEditPhotos(prev => {
-            const updated = [...prev];
-            updated[index] = downloadUrl;
-            return updated;
-          });
-        } else {
-          setNewPhotos(prev => {
-            const updated = [...prev];
-            updated[index] = downloadUrl;
-            return updated;
-          });
+    setCompressionFeedback(null);
+    setIsPhotoUploading(true);
+
+    const fileList = Array.from(rawFiles);
+    
+    try {
+      for (let i = 0; i < fileList.length; i++) {
+        let file = fileList[i];
+        if (file.type.startsWith('image/') && file.size > 1 * 1024 * 1024) {
+          try {
+            file = await compressImageFile(file, (info) => {
+              setCompressionFeedback(info);
+            });
+          } catch (err) {
+            console.error("Image compression error:", err);
+          }
         }
-      } catch (err) {
-        console.error("Firebase Storage failed, trying local Base64 fallback if file < 1MB:", err);
-        if (file.size <= 800 * 1024) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            if (isEditMode) {
-              setEditPhotos(prev => {
-                const updated = [...prev];
-                updated[index] = reader.result as string;
-                return updated;
-              });
-            } else {
-              setNewPhotos(prev => {
-                const updated = [...prev];
-                updated[index] = reader.result as string;
-                return updated;
-              });
-            }
-          };
-          reader.readAsDataURL(file);
-        } else {
-          alert(
-            'Gagal mengunggah berkas ke Cloud Storage.\n\n' +
-            'Penyebab: Layanan Firebase Storage belum aktif atau koneksi terputus.\n' +
-            'Untuk mengunggah berkas di atas 1MB, pastikan "Storage" di Firebase Console Anda sudah diaktifkan.'
-          );
+
+        if (file.size > 15 * 1024 * 1024) {
+          alert(`Ukuran berkas "${file.name}" melebihi batas (Maks. 15MB)`);
+          continue;
         }
-      } finally {
-        setIsPhotoUploading(false);
+
+        let uploadedUrl = '';
+        try {
+          uploadedUrl = await uploadFileToStorage(file, 'photos');
+        } catch (err) {
+          console.error("Firebase Storage failed, trying local Base64 fallback if file < 1MB:", err);
+          if (file.size <= 800 * 1024) {
+            uploadedUrl = await new Promise<string>((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.readAsDataURL(file);
+            });
+          } else {
+            alert(
+              'Gagal mengunggah berkas ke Cloud Storage.\n\n' +
+              'Penyebab: Layanan Firebase Storage belum aktif atau koneksi terputus.'
+            );
+            continue;
+          }
+        }
+
+        if (uploadedUrl) {
+          if (isEditMode) {
+            setEditPhotos(prev => {
+              const updated = [...prev];
+              if (index >= 0) {
+                updated[index] = uploadedUrl;
+              } else {
+                const emptyIdx = updated.findIndex(slot => !slot);
+                if (emptyIdx !== -1) updated[emptyIdx] = uploadedUrl;
+                else updated[0] = uploadedUrl;
+              }
+              return updated;
+            });
+          } else {
+            setNewPhotos(prev => {
+              const updated = [...prev];
+              if (index >= 0) {
+                updated[index] = uploadedUrl;
+              } else {
+                const emptyIdx = updated.findIndex(slot => !slot);
+                if (emptyIdx !== -1) updated[emptyIdx] = uploadedUrl;
+                else updated[0] = uploadedUrl;
+              }
+              return updated;
+            });
+          }
+        }
       }
+    } finally {
+      setIsPhotoUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -664,73 +673,66 @@ export default function VillageOperator({
               </div>
             )}
 
-            {/* 4 File upload slots for Laporan Realisasi Fisik */}
-            <div className="space-y-3 md:col-span-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <div className="flex flex-col gap-0.5">
-                <label className="block text-xs font-bold text-slate-700 uppercase">
-                  Dokumen Laporan Realisasi Fisik (PDF / Docx / Xlsx / Gambar - Maks. 4 Berkas)
-                </label>
-                <span className="text-[10px] text-slate-500 font-normal">
-                  Unggah 4 berkas Laporan Realisasi Fisik berupa PDF, Word (.docx), Excel (.xlsx), atau Gambar/Foto fisik dari kamera & galeri HP.
+            {/* File Laporan Realisasi Fisik */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-700 uppercase">File Laporan Realisasi Fisik (PDF / Docx / Xlsx / Gambar)</label>
+              <input
+                type="file"
+                multiple
+                accept="image/*, application/pdf, .docx, .xlsx, .doc, .xls"
+                id="add-photo-file-bar"
+                onChange={(e) => handlePhotoFileChange(e, false, -1)}
+                className="hidden"
+              />
+              <label 
+                htmlFor="add-photo-file-bar"
+                className="flex items-center justify-center gap-2 border border-slate-300 border-dashed rounded-lg p-2.5 text-slate-600 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors text-xs font-semibold text-center"
+              >
+                <FileText className="w-4 h-4 text-slate-400" />
+                <span>
+                  {isPhotoUploading 
+                    ? 'Mengunggah ke Cloud Storage...' 
+                    : (newPhotos.filter(Boolean).length > 0 
+                        ? `${newPhotos.filter(Boolean).length} Berkas Fisik Terunggah (Pilih untuk Tambah/Ganti)` 
+                        : 'Pilih Berkas Laporan Realisasi Fisik (PDF / Docx / Xlsx / Foto)'
+                      )
+                  }
                 </span>
-              </div>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[0, 1, 2, 3].map((idx) => {
-                  const photo = newPhotos[idx];
-                  return (
-                    <div key={idx} className="relative group">
-                      <input
-                        type="file"
-                        accept="image/*, application/pdf, .docx, .xlsx, .doc, .xls"
-                        id={`add-photo-file-${idx}`}
-                        onChange={(e) => handlePhotoFileChange(e, false, idx)}
-                        className="hidden"
-                      />
-                      {photo ? (
-                        <div className="relative aspect-video rounded-lg overflow-hidden border border-slate-300 bg-white shadow-xs">
-                          {photo.startsWith('data:application/pdf') || photo.includes('.pdf') ? (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-red-50 text-red-600 p-2 text-center text-[10px]">
-                              <FileText className="w-6 h-6 mb-1 text-red-500" />
-                              <span className="font-semibold truncate w-full">PDF Berkas</span>
-                            </div>
-                          ) : (
-                            <img src={photo} alt={`Berkas Fisik ${idx + 1}`} className="w-full h-full object-cover" />
-                          )}
-                          <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setNewPhotos(prev => {
-                                  const updated = [...prev];
-                                  updated[idx] = '';
-                                  return updated;
-                                });
-                              }}
-                              className="bg-rose-600 hover:bg-rose-700 text-white p-1.5 rounded-full transition-colors cursor-pointer"
-                              title="Hapus"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                          <div className="absolute bottom-1 left-1 bg-slate-900/75 text-white text-[9px] px-1.5 py-0.5 rounded font-medium">
-                            Slot {idx + 1}
-                          </div>
-                        </div>
-                      ) : (
-                        <label
-                          htmlFor={`add-photo-file-${idx}`}
-                          className="flex flex-col items-center justify-center aspect-video border border-slate-300 border-dashed rounded-lg bg-white cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all text-center p-2 group"
+              </label>
+
+              {/* Badges for uploaded physical files */}
+              {newPhotos.filter(Boolean).length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {newPhotos.map((photo, idx) => {
+                    if (!photo) return null;
+                    const isPdf = photo.startsWith('data:application/pdf') || photo.includes('.pdf');
+                    return (
+                      <div key={idx} className="flex items-center gap-1.5 bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs shadow-xs">
+                        {isPdf ? (
+                          <FileText className="w-4 h-4 text-red-500 flex-shrink-0" />
+                        ) : (
+                          <img src={photo} alt={`Berkas ${idx + 1}`} className="w-5 h-5 object-cover rounded flex-shrink-0" />
+                        )}
+                        <span className="text-[11px] font-semibold text-slate-700 max-w-[140px] truncate">Berkas Fisik {idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewPhotos(prev => {
+                              const updated = [...prev];
+                              updated[idx] = '';
+                              return updated;
+                            });
+                          }}
+                          className="text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors cursor-pointer ml-1"
+                          title="Hapus Berkas"
                         >
-                          <Camera className="w-5 h-5 text-slate-400 group-hover:text-blue-500 mb-1" />
-                          <span className="text-[10px] text-slate-600 font-semibold">Berkas Fisik {idx + 1}</span>
-                          <span className="text-[8px] text-slate-400">PDF / Docx / Xlsx / Foto</span>
-                        </label>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
