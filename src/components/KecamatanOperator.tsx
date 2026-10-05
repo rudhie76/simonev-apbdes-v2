@@ -452,7 +452,7 @@ export default function KecamatanOperator({
                         <div className="flex flex-col gap-1.5 p-2.5 bg-slate-100 rounded-lg border border-slate-200 text-xs w-full sm:w-auto">
                           <span className="font-bold text-slate-700 flex items-center gap-1">
                             <ImageIcon className="w-3.5 h-3.5 text-slate-500" />
-                            Dokumen Ceklist ({act.photoUrl.split(';').filter(Boolean).length} Berkas):
+                            Dokumen Laporan Realisasi Fisik ({act.photoUrl.split(';').filter(Boolean).length} Berkas):
                           </span>
                           <div className="flex flex-wrap gap-2">
                             {act.photoUrl.split(';').filter(Boolean).map((photo, pIdx) => {
@@ -472,7 +472,7 @@ export default function KecamatanOperator({
                                   ) : (
                                     <img 
                                       src={photo} 
-                                      alt={`Foto Ceklist ${pIdx + 1}`} 
+                                      alt={`File Realisasi ${pIdx + 1}`} 
                                       className="w-10 h-10 object-cover rounded border border-slate-300 hover:scale-105 hover:border-blue-500 transition-all cursor-pointer" 
                                       onClick={() => setPreviewPhoto(photo)}
                                       title="Klik untuk Perbesar Foto"
@@ -488,12 +488,12 @@ export default function KecamatanOperator({
                             className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-[9px] px-2 py-1 rounded transition-colors cursor-pointer mt-1 text-center flex items-center gap-1 justify-center"
                           >
                             <Download className="w-3 h-3" />
-                            <span>Unduh Semua Dokumen Ceklist ({act.photoUrl.split(';').filter(Boolean).length})</span>
+                            <span>Unduh Semua File Realisasi Fisik ({act.photoUrl.split(';').filter(Boolean).length})</span>
                           </button>
                         </div>
                       ) : (
                         <span className="text-xs text-slate-400 bg-slate-100 border border-slate-200 px-2 py-1.5 rounded-lg flex items-center gap-1.5">
-                          <AlertCircle className="w-4 h-4" /> Belum ada berkas dokumen ceklist
+                          <AlertCircle className="w-4 h-4" /> Belum ada berkas laporan realisasi fisik
                         </span>
                       )}
 
