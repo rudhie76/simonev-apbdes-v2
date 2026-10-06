@@ -148,6 +148,49 @@ const INITIAL_SISKEUDES_PAGU: SiskeudesPagu[] = [
   }
 ];
 
+const INITIAL_USERS = [
+  {
+    id: 'usr-bm',
+    fullName: 'Operator Desa Bangun Mulya',
+    username: 'ops.bangunmulya',
+    role: 'OP_BANGUN_MULYA',
+    phoneNip: '-',
+    registeredAt: '2026-01-01T00:00:00Z',
+    lastLogin: '2026-10-06T12:00:00Z',
+    status: 'Aktif'
+  },
+  {
+    id: 'usr-sl',
+    fullName: 'Operator Desa Sesulu',
+    username: 'ops.sesulu',
+    role: 'OP_SESULU',
+    phoneNip: '-',
+    registeredAt: '2026-01-01T00:00:00Z',
+    lastLogin: '2026-10-06T12:00:00Z',
+    status: 'Aktif'
+  },
+  {
+    id: 'usr-aa',
+    fullName: 'Operator Desa Api-api',
+    username: 'ops.apiapi',
+    role: 'OP_API_API',
+    phoneNip: '-',
+    registeredAt: '2026-01-01T00:00:00Z',
+    lastLogin: '2026-10-06T12:00:00Z',
+    status: 'Aktif'
+  },
+  {
+    id: 'usr-kc',
+    fullName: 'Operator PMD Kecamatan Waru',
+    username: 'ops.kecamatan',
+    role: 'OP_KECAMATAN',
+    phoneNip: '-',
+    registeredAt: '2026-01-01T00:00:00Z',
+    lastLogin: '2026-10-06T12:00:00Z',
+    status: 'Aktif'
+  }
+];
+
 // Helper function to safely write state to LocalStorage and handle quota limits
 function safeSaveToLocalStorage(key: string, data: any) {
   try {
@@ -446,7 +489,6 @@ export default function App() {
             bList.push(docSnap.data() as BumdesMonev);
           });
           setBumdesMonevList(bList);
-          safeSaveToLocalStorage('simonev_bumdes', bList);
         }
       } catch (error) {
         handleSubError(error, 'bumdes_monev');
@@ -455,11 +497,38 @@ export default function App() {
       handleSubError(error, 'bumdes_monev');
     });
 
+    // 5. Subscribe to Users
+    const unsubscribeUsers = onSnapshot(collection(db, 'users'), async (snapshot) => {
+      try {
+        if (snapshot.empty) {
+          console.log("Seeding initial Users list into Cloud Firestore...");
+          try {
+            for (const item of INITIAL_USERS) {
+              await setDoc(doc(db, 'users', item.id), item);
+            }
+          } catch (seedErr) {
+            console.warn("Failed seeding initial users:", seedErr);
+          }
+        } else {
+          const userList: any[] = [];
+          snapshot.forEach((docSnap) => {
+            userList.push(docSnap.data());
+          });
+          safeSaveToLocalStorage('simonev_users', userList);
+        }
+      } catch (error) {
+        handleSubError(error, 'users');
+      }
+    }, (error) => {
+      handleSubError(error, 'users');
+    });
+
     return () => {
       unsubscribeActs();
       unsubscribeLogs();
       unsubscribePagu();
       unsubscribeBumdes();
+      unsubscribeUsers();
     };
   }, []);
 

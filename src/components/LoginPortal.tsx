@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { UserRole } from '../types';
 import { Lock, ShieldAlert, Key, UserPlus, LogIn, CheckCircle2, AlertCircle, Eye, EyeOff, User, Phone } from 'lucide-react';
 import logoPpu from '../assets/logo.png';
+import { doc, setDoc } from '../lib/sheetsApi';
+import { db } from '../lib/firebase';
 
 // Credential dictionary for default system accounts
 export const OPERATOR_CREDENTIALS = {
@@ -158,6 +160,18 @@ export default function LoginPortal({ onLoginSuccess, defaultRolePreference }: L
       const updated = [newAcc, ...registeredAccounts];
       setRegisteredAccounts(updated);
       localStorage.setItem('simonev_registered_accounts', JSON.stringify(updated));
+
+      // Sync new account to Google Sheets / Firestore users tab
+      try {
+        setDoc(doc(db, 'users', newAcc.id), {
+          ...newAcc,
+          phoneNip: newAcc.phoneNip || '-',
+          lastLogin: new Date().toISOString(),
+          status: 'Aktif'
+        });
+      } catch (err) {
+        console.warn("Failed syncing user account to sheets:", err);
+      }
 
       // Reset Register fields
       setRegFullName('');
