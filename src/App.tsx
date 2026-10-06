@@ -215,8 +215,19 @@ export default function App() {
     return INITIAL_LOGS;
   });
 
+  const getActYear = (rawYear: any): number => {
+    if (!rawYear) return 2026;
+    if (typeof rawYear === 'number') return rawYear;
+    const str = String(rawYear).trim();
+    const parsed = parseInt(str, 10);
+    if (!isNaN(parsed) && parsed >= 2020 && parsed <= 2035) return parsed;
+    const dateYear = new Date(str).getFullYear();
+    if (!isNaN(dateYear) && dateYear >= 2020 && dateYear <= 2035) return dateYear;
+    return 2026;
+  };
+
   const filteredActivitiesByYear = useMemo(() => {
-    return activities.filter((act) => (act.year || 2026) === selectedYear);
+    return activities.filter((act) => getActYear(act.year) === selectedYear);
   }, [activities, selectedYear]);
 
   const [siskeudesPagu, setSiskeudesPagu] = useState<SiskeudesPagu[]>(() => {
@@ -290,7 +301,41 @@ export default function App() {
         } else {
           const actsList: Activity[] = [];
           snapshot.forEach((docSnap) => {
-            actsList.push(docSnap.data() as Activity);
+            const raw: any = docSnap.data();
+            if (raw && (raw.id || raw.name)) {
+              const budgetTotal = Number(String(raw.budgetTotal || 0).replace(/[^0-9.]/g, '')) || 0;
+              const budgetSpent = Number(String(raw.budgetSpent || 0).replace(/[^0-9.]/g, '')) || 0;
+              const progressPhysical = Number(String(raw.progressPhysical || 0).replace(/[^0-9.]/g, '')) || 0;
+              const isApproved = raw.isKecamatanApproved === true || 
+                                 String(raw.isKecamatanApproved).trim().toUpperCase() === 'TRUE' ||
+                                 raw.recommendation === true;
+              
+              const parsedAct: Activity = {
+                ...raw,
+                id: String(raw.id || `act-${Date.now()}`),
+                name: String(raw.name || 'Kegiatan Tanpa Nama'),
+                village: String(raw.village || 'Bangun Mulya'),
+                sector: String(raw.sector || 'Pembangunan Desa (Infrastruktur)'),
+                budgetTotal,
+                budgetSpent,
+                progressPhysical,
+                status: raw.status || (progressPhysical === 100 ? (isApproved ? 'SELESAI' : 'MENUNGGU_EVALUASI') : (progressPhysical > 0 ? 'DALAM_PROSES' : 'BELUM_MULAI')),
+                sourceOfFunds: raw.sourceOfFunds || 'Dana Desa (DD)',
+                photoUrl: raw.photoUrl || undefined,
+                photoName: raw.photoName || undefined,
+                budgetReportUrl: raw.budgetReportUrl || undefined,
+                budgetReportName: raw.budgetReportName || undefined,
+                incompleteReason: raw.incompleteReason || undefined,
+                isKecamatanApproved: isApproved,
+                recommendation: typeof raw.recommendation === 'string' ? raw.recommendation : (raw.approvedBy && typeof raw.approvedBy === 'string' ? raw.approvedBy : undefined),
+                approvedBy: typeof raw.approvedBy === 'string' ? raw.approvedBy : undefined,
+                approvedAt: typeof raw.approvedAt === 'string' ? raw.approvedAt : undefined,
+                lastUpdated: raw.lastUpdated || new Date().toISOString(),
+                createdAt: raw.createdAt || new Date().toISOString(),
+                year: getActYear(raw.year)
+              };
+              actsList.push(parsedAct);
+            }
           });
           // Sort by createdAt descending
           actsList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
