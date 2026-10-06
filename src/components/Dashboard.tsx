@@ -207,11 +207,17 @@ export default function Dashboard({
 
   // Calculation per Village for bento tiles
   const villageStats = useMemo(() => {
-    const list: { name: Village; totalBudget: number; spent: number; count: number; completedCount: number; progress: number }[] = [
-      { name: 'Bangun Mulya', totalBudget: villageBudgets['Bangun Mulya'], spent: 0, count: 0, completedCount: 0, progress: 0 },
-      { name: 'Sesulu', totalBudget: villageBudgets['Sesulu'], spent: 0, count: 0, completedCount: 0, progress: 0 },
-      { name: 'Api-api', totalBudget: villageBudgets['Api-api'], spent: 0, count: 0, completedCount: 0, progress: 0 }
-    ];
+    const allVillages: Village[] = ['Bangun Mulya', 'Sesulu', 'Api-api'];
+    const targetVillages: Village[] = selectedVillage === 'ALL' ? allVillages : [selectedVillage];
+
+    const list = targetVillages.map(vName => ({
+      name: vName,
+      totalBudget: villageBudgets[vName] || 0,
+      spent: 0,
+      count: 0,
+      completedCount: 0,
+      progress: 0
+    }));
 
     list.forEach(v => {
       const vActs = activities.filter(a => a.village === v.name);
@@ -222,7 +228,7 @@ export default function Dashboard({
     });
 
     return list;
-  }, [activities, villageBudgets]);
+  }, [activities, villageBudgets, selectedVillage]);
 
   // Chart data formatted specifically for Recharts comparison
   const chartData = useMemo(() => {
@@ -232,6 +238,12 @@ export default function Dashboard({
       Realisasi: v.spent,
     }));
   }, [villageStats]);
+
+  // Filter notification logs for active village selection
+  const filteredLogs = useMemo(() => {
+    if (selectedVillage === 'ALL') return notificationLogs;
+    return notificationLogs.filter(log => !log.village || log.village === selectedVillage);
+  }, [notificationLogs, selectedVillage]);
 
   // Format Helper for Y-Axis values to Indonesian financial notation (Milyar / Juta)
   const formatYAxis = (value: number) => {
@@ -282,7 +294,8 @@ export default function Dashboard({
   // Sector breakdown calculations
   const sectorData = useMemo(() => {
     const sectors: Record<string, { budget: number; spent: number; count: number }> = {};
-    activities.forEach(act => {
+    const targetActs = selectedVillage === 'ALL' ? activities : activities.filter(a => a.village === selectedVillage);
+    targetActs.forEach(act => {
       if (!sectors[act.sector]) {
         sectors[act.sector] = { budget: 0, spent: 0, count: 0 };
       }
@@ -296,7 +309,7 @@ export default function Dashboard({
       ...data,
       percent: data.budget > 0 ? Math.round((data.spent / data.budget) * 100) : 0
     }));
-  }, [activities]);
+  }, [activities, selectedVillage]);
 
   // Filtered BUMDes entries based on village filter
   const filteredBumdesList = useMemo(() => {
@@ -871,10 +884,10 @@ export default function Dashboard({
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-4 max-h-[380px] pr-1">
-            {notificationLogs.length === 0 ? (
-              <p className="text-slate-400 text-sm text-center py-8">Belum ada pembaruan log.</p>
+            {filteredLogs.length === 0 ? (
+              <p className="text-slate-400 text-sm text-center py-8">Belum ada pembaruan log untuk wilayah ini.</p>
             ) : (
-              notificationLogs.map((log) => (
+              filteredLogs.map((log) => (
                 <div key={log.id} className="p-3 bg-slate-50 hover:bg-slate-100/70 transition-colors rounded-xl border border-slate-200/50 relative overflow-hidden flex gap-3">
                   <div className={`w-1 absolute left-0 top-0 bottom-0 ${
                     log.type === 'approval' ? 'bg-emerald-500' :
