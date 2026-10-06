@@ -5,7 +5,9 @@ const urlsToCache = [
   './index.html',
   './manifest.json',
   './logo.png',
-  './favicon.png'
+  './favicon.png',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // Install Event
