@@ -54,9 +54,16 @@ export default function InputPaguAnggaran({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  // Helper to retrieve the most recently synced pagu record for a village and year
+  const getLatestPagu = (v: Village): SiskeudesPagu | undefined => {
+    const matches = paguList.filter(p => p.village === v && (p.year || 2026) === selectedYear);
+    if (matches.length === 0) return undefined;
+    return matches.sort((a, b) => new Date(b.lastSynced || 0).getTime() - new Date(a.lastSynced || 0).getTime())[0];
+  };
+
   // Sync state whenever targetVillage or selectedYear changes, pre-filling with current Firestore values
   useEffect(() => {
-    const currentPagu = paguList.find(p => p.village === targetVillage && (p.year || 2026) === selectedYear);
+    const currentPagu = getLatestPagu(targetVillage);
     if (currentPagu && currentPagu.fundsBreakdown) {
       setDd(currentPagu.fundsBreakdown.dd || 0);
       setAdd(currentPagu.fundsBreakdown.add || 0);
@@ -75,12 +82,12 @@ export default function InputPaguAnggaran({
     }
     setSaveSuccess(false);
     setIsDirty(false);
-  }, [targetVillage, selectedYear]);
+  }, [targetVillage, selectedYear, paguList]);
 
   // If paguList updates from server and user has not made local unsaved edits, sync baseline once
   useEffect(() => {
     if (!isDirty) {
-      const currentPagu = paguList.find(p => p.village === targetVillage && (p.year || 2026) === selectedYear);
+      const currentPagu = getLatestPagu(targetVillage);
       if (currentPagu && currentPagu.fundsBreakdown) {
         setDd(currentPagu.fundsBreakdown.dd || 0);
         setAdd(currentPagu.fundsBreakdown.add || 0);
@@ -159,7 +166,7 @@ export default function InputPaguAnggaran({
       {/* Target Status Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {(['Bangun Mulya', 'Sesulu', 'Api-api'] as Village[]).map((v) => {
-          const paguObj = paguList.find(p => p.village === v && (p.year || 2026) === selectedYear);
+          const paguObj = getLatestPagu(v);
           const isSelected = targetVillage === v;
           const isRestrictedForUser = isOperatorDesa && getDefaultVillage() !== v;
 

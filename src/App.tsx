@@ -395,16 +395,27 @@ export default function App() {
           console.log("Seeding initial Siskeudes APBDes pagu into Cloud Firestore...");
           try {
             for (const item of INITIAL_SISKEUDES_PAGU) {
-              await setDoc(doc(db, 'siskeudes_pagu', item.village), item);
+              const docId = item.id || `${item.village}_${item.year || 2026}`;
+              await setDoc(doc(db, 'siskeudes_pagu', docId), item);
             }
           } catch (seedErr) {
             console.warn("Failed seeding initial pagu:", seedErr);
           }
         } else {
-          const paguList: SiskeudesPagu[] = [];
+          const paguMap = new Map<string, SiskeudesPagu>();
           snapshot.forEach((docSnap) => {
-            paguList.push(docSnap.data() as SiskeudesPagu);
+            const data = docSnap.data() as SiskeudesPagu;
+            const docId = data.id || docSnap.id || `${data.village}_${data.year || 2026}`;
+            const rawYear = data.year || (docId.includes('_') ? parseInt(docId.split('_')[1], 10) : 2026);
+            const yearNum = !isNaN(rawYear) ? rawYear : 2026;
+            const key = `${data.village}_${yearNum}`;
+
+            const existing = paguMap.get(key);
+            if (!existing || (data.lastSynced && new Date(data.lastSynced).getTime() > new Date(existing.lastSynced || 0).getTime())) {
+              paguMap.set(key, { ...data, id: key, year: yearNum });
+            }
           });
+          const paguList = Array.from(paguMap.values());
           setSiskeudesPagu(paguList);
           safeSaveToLocalStorage('simonev_siskeudes_pagu', paguList);
         }
