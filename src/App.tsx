@@ -13,7 +13,9 @@ import {
   IncompleteReasonHistoryEntry,
   RecommendationHistoryEntry,
   SiskeudesPagu,
-  BumdesMonev
+  BumdesMonev,
+  RegisteredAccount,
+  UserStatus
 } from './types';
 import { 
   INITIAL_ACTIVITIES, 
@@ -33,6 +35,7 @@ import LoginPortal from './components/LoginPortal';
 import PrintReportModal from './components/PrintReportModal';
 import PrintProposalModal from './components/PrintProposalModal';
 import BumdesMonevBoard from './components/BumdesMonevBoard';
+import UserManagementModal from './components/UserManagementModal';
 import logoPpu from './assets/logo.png';
 
 // Icons
@@ -44,6 +47,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   User,
+  UserCheck,
   Users,
   Eye,
   FileCheck,
@@ -322,6 +326,37 @@ export default function App() {
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [printModalVillageFilter, setPrintModalVillageFilter] = useState<Village | 'ALL'>('ALL');
 
+  // Users state & User verification modal
+  const [usersList, setUsersList] = useState<RegisteredAccount[]>(() => {
+    const savedUsers = localStorage.getItem('simonev_users');
+    const savedReg = localStorage.getItem('simonev_registered_accounts');
+    let combined: RegisteredAccount[] = [];
+    if (savedUsers) {
+      try {
+        const parsed = JSON.parse(savedUsers);
+        if (Array.isArray(parsed)) combined = [...parsed];
+      } catch (e) {}
+    }
+    if (savedReg) {
+      try {
+        const reg = JSON.parse(savedReg);
+        if (Array.isArray(reg)) {
+          reg.forEach((r: any) => {
+            const idx = combined.findIndex(c => c.id === r.id || c.username.toLowerCase() === r.username.toLowerCase());
+            if (idx >= 0) {
+              combined[idx] = { ...combined[idx], ...r };
+            } else {
+              combined.push(r);
+            }
+          });
+        }
+      } catch (e) {}
+    }
+    return combined.length > 0 ? combined : (INITIAL_USERS as RegisteredAccount[]);
+  });
+
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
   // Toggle state for administrative developer help panel (false = pure clean production look)
   const [showDevPanel, setShowDevPanel] = useState(false);
 
@@ -510,10 +545,11 @@ export default function App() {
             console.warn("Failed seeding initial users:", seedErr);
           }
         } else {
-          const userList: any[] = [];
+          const userList: RegisteredAccount[] = [];
           snapshot.forEach((docSnap) => {
-            userList.push(docSnap.data());
+            userList.push(docSnap.data() as RegisteredAccount);
           });
+          setUsersList(userList);
           safeSaveToLocalStorage('simonev_users', userList);
         }
       } catch (error) {
@@ -583,6 +619,76 @@ export default function App() {
       }
     }
   };
+
+  // User Verification & Account Status Mutation Handlers
+  const handleUpdateUserStatus = async (userId: string, newStatus: UserStatus, approvedBy: string) => {
+    const updated = usersList.map(u => {
+      if (u.id === userId) {
+        return {
+          ...u,
+          status: newStatus,
+          approvedBy,
+          approvedAt: new Date().toISOString()
+        };
+      }
+      return u;
+    });
+
+    setUsersList(updated);
+    safeSaveToLocalStorage('simonev_users', updated);
+
+    // Sync to LocalStorage simonev_registered_accounts too
+    try {
+      const regSaved = localStorage.getItem('simonev_registered_accounts');
+      if (regSaved) {
+        const parsed: RegisteredAccount[] = JSON.parse(regSaved);
+        const updatedReg = parsed.map(u => u.id === userId ? { ...u, status: newStatus, approvedBy, approvedAt: new Date().toISOString() } : u);
+        localStorage.setItem('simonev_registered_accounts', JSON.stringify(updatedReg));
+      }
+    } catch (e) {}
+
+    // Sync to Cloud Firestore
+    try {
+      const targetUser = updated.find(u => u.id === userId);
+      if (targetUser) {
+        await setDoc(doc(db, 'users', userId), targetUser);
+      }
+    } catch (err) {
+      console.warn("Failed updating user status in Firestore:", err);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    const updated = usersList.filter(u => u.id !== userId);
+    setUsersList(updated);
+    safeSaveToLocalStorage('simonev_users', updated);
+
+    try {
+      const regSaved = localStorage.getItem('simonev_registered_accounts');
+      if (regSaved) {
+        const parsed: RegisteredAccount[] = JSON.parse(regSaved);
+        const updatedReg = parsed.filter(u => u.id !== userId);
+        localStorage.setItem('simonev_registered_accounts', JSON.stringify(updatedReg));
+      }
+    } catch (e) {}
+
+    try {
+      await deleteDoc(doc(db, 'users', userId));
+    } catch (err) {
+      console.warn("Failed deleting user from Firestore:", err);
+    }
+  };
+
+  const scopedPendingUsers = useMemo(() => {
+    return usersList.filter(u => {
+      if (activeRole === 'OP_KECAMATAN') {
+        return u.status === 'Pending' || !u.status;
+      }
+      return u.role === activeRole && (u.status === 'Pending' || !u.status);
+    });
+  }, [usersList, activeRole]);
+
+  const pendingUsersCount = scopedPendingUsers.length;
 
   // --- 3. Mutation Operations (Event Handlers) ---
   
@@ -1355,6 +1461,26 @@ export default function App() {
             >
               <span className="mr-3">📘</span> Panduan Operator
             </button>
+
+            {activeRole !== 'PUBLIC' && (
+              <button
+                onClick={() => setIsUserModalOpen(true)}
+                className={`w-full px-4 py-2.5 rounded-lg font-semibold text-sm flex items-center transition-all justify-between text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer mt-1`}
+              >
+                <div className="flex items-center">
+                  <span className="mr-3">👥</span> Verifikasi User
+                </div>
+                {pendingUsersCount > 0 ? (
+                  <span className="bg-amber-500 text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded-full animate-pulse shadow-xs">
+                    {pendingUsersCount}
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-slate-500 font-mono font-bold uppercase">
+                    {usersList.length}
+                  </span>
+                )}
+              </button>
+            )}
           </nav>
 
           {/* Dynamic Active Operator Status Profiler Box */}
@@ -1447,6 +1573,25 @@ export default function App() {
                 <p className="text-[9px] text-slate-400 uppercase font-bold leading-none">Terakhir Sinkronisasi</p>
                 <p className="text-xs font-bold text-slate-700 mt-1">Hari Ini, Real-time WIB</p>
               </div>
+              {activeRole !== 'PUBLIC' && (
+                <button
+                  onClick={() => setIsUserModalOpen(true)}
+                  className={`px-3 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    pendingUsersCount > 0
+                      ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-sm font-extrabold animate-pulse'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
+                  }`}
+                  title="Verifikasi & Persetujuan Akun Operator Baru"
+                >
+                  <UserCheck className="w-3.5 h-3.5" />
+                  <span className="hidden lg:inline">Verifikasi Akun</span>
+                  {pendingUsersCount > 0 && (
+                    <span className="bg-amber-800 text-white text-[9px] px-1.5 py-0.2 rounded-full font-mono font-bold">
+                      {pendingUsersCount}
+                    </span>
+                  )}
+                </button>
+              )}
               <button 
                 onClick={() => window.print()}
                 className="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-700 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
@@ -1746,6 +1891,16 @@ export default function App() {
         activities={filteredActivitiesByYear}
         villageBudgets={villageBudgets}
         selectedYear={selectedYear}
+      />
+
+      {/* User Verification & Account Approval Modal Overlay */}
+      <UserManagementModal
+        isOpen={isUserModalOpen}
+        onClose={() => setIsUserModalOpen(false)}
+        activeRole={activeRole}
+        users={usersList}
+        onUpdateUserStatus={handleUpdateUserStatus}
+        onDeleteUser={handleDeleteUser}
       />
 
       {/* Detailed Side / Hover Overlay Modal for Activity */}

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { UserRole } from '../types';
-import { Lock, ShieldAlert, Key, UserPlus, LogIn, CheckCircle2, AlertCircle, Eye, EyeOff, User, Phone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { UserRole, RegisteredAccount, UserStatus } from '../types';
+import { Lock, ShieldAlert, Key, UserPlus, LogIn, CheckCircle2, AlertCircle, Eye, EyeOff, User, Phone, Clock } from 'lucide-react';
 import logoPpu from '../assets/logo.png';
 import { doc, setDoc } from '../lib/sheetsApi';
 import { db } from '../lib/firebase';
@@ -33,15 +33,7 @@ export const OPERATOR_CREDENTIALS = {
   }
 };
 
-export interface RegisteredAccount {
-  id: string;
-  fullName: string;
-  role: UserRole;
-  username: string;
-  password: string;
-  phoneNip?: string;
-  registeredAt: string;
-}
+export type { RegisteredAccount };
 
 interface LoginPortalProps {
   onLoginSuccess: (role: UserRole) => void;
@@ -70,16 +62,63 @@ export default function LoginPortal({ onLoginSuccess, defaultRolePreference }: L
   const [regShowPassword, setRegShowPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
 
-  // Registered accounts state
+  // Registered accounts state loaded from LocalStorage (both registered accounts and users cache)
   const [registeredAccounts, setRegisteredAccounts] = useState<RegisteredAccount[]>(() => {
     try {
-      const saved = localStorage.getItem('simonev_registered_accounts');
-      if (saved) return JSON.parse(saved);
+      const savedReg = localStorage.getItem('simonev_registered_accounts');
+      const savedUsers = localStorage.getItem('simonev_users');
+      let combined: RegisteredAccount[] = [];
+      if (savedReg) combined = [...JSON.parse(savedReg)];
+      if (savedUsers) {
+        const uList = JSON.parse(savedUsers);
+        if (Array.isArray(uList)) {
+          uList.forEach(u => {
+            if (u.username && !combined.some(c => c.username.toLowerCase() === u.username.toLowerCase())) {
+              combined.push(u);
+            }
+          });
+        }
+      }
+      return combined;
     } catch (e) {
       console.warn("Failed loading registered accounts:", e);
     }
     return [];
   });
+
+  // Keep registered accounts in sync with LocalStorage changes
+  useEffect(() => {
+    const syncAccounts = () => {
+      try {
+        const savedReg = localStorage.getItem('simonev_registered_accounts');
+        const savedUsers = localStorage.getItem('simonev_users');
+        let combined: RegisteredAccount[] = [];
+        if (savedReg) combined = [...JSON.parse(savedReg)];
+        if (savedUsers) {
+          const uList = JSON.parse(savedUsers);
+          if (Array.isArray(uList)) {
+            uList.forEach(u => {
+              if (u.username) {
+                const idx = combined.findIndex(c => c.username.toLowerCase() === u.username.toLowerCase() || c.id === u.id);
+                if (idx >= 0) {
+                  combined[idx] = { ...combined[idx], ...u };
+                } else {
+                  combined.push(u);
+                }
+              }
+            });
+          }
+        }
+        setRegisteredAccounts(combined);
+      } catch (err) {
+        console.warn("Sync error:", err);
+      }
+    };
+
+    syncAccounts();
+    window.addEventListener('storage', syncAccounts);
+    return () => window.removeEventListener('storage', syncAccounts);
+  }, []);
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,21 +132,57 @@ export default function LoginPortal({ onLoginSuccess, defaultRolePreference }: L
       const cleanUser = username.trim().toLowerCase();
       const defaultCred = OPERATOR_CREDENTIALS[selectedRole];
 
-      // Check default system credentials
+      // Check default system credentials (always active)
       const matchesDefault = (cleanUser === defaultCred.username.toLowerCase() && password === defaultCred.password);
+
+      if (matchesDefault) {
+        onLoginSuccess(selectedRole);
+        setIsAuthenticating(false);
+        return;
+      }
 
       // Check user-registered credentials
       const matchesRegistered = registeredAccounts.find(
         acc => acc.username.toLowerCase() === cleanUser && acc.password === password && acc.role === selectedRole
       );
 
-      if (matchesDefault || matchesRegistered) {
-        onLoginSuccess(selectedRole);
-        setIsAuthenticating(false);
-      } else {
-        setErrorMsg('Autentikasi gagal! Username atau Kata Sandi yang Anda masukkan salah atau peran tidak sesuai.');
-        setIsAuthenticating(false);
+      if (matchesRegistered) {
+        // Enforce Verification & Approval Status Check!
+        const status = matchesRegistered.status || 'Pending';
+
+        if (status === 'Pending') {
+          setErrorMsg(`🚫 AKUN MENUNGGU VERIFIKASI: Akun "${matchesRegistered.fullName}" belum disetujui / diverifikasi oleh Operator Desa atau Kecamatan. Silakan hubungi Operator untuk verifikasi akun.`);
+          setIsAuthenticating(false);
+          return;
+        }
+
+        if (status === 'Ditolak') {
+          setErrorMsg(`🚫 AKUN DITOLAK: Pendaftaran akun "${matchesRegistered.fullName}" telah DITOLAK oleh Operator. Silakan hubungi Operator Desa atau Kecamatan.`);
+          setIsAuthenticating(false);
+          return;
+        }
+
+        if (status === 'Aktif') {
+          // Update last login
+          const updatedLogin = new Date().toISOString();
+          try {
+            setDoc(doc(db, 'users', matchesRegistered.id), {
+              ...matchesRegistered,
+              lastLogin: updatedLogin,
+              status: 'Aktif'
+            });
+          } catch (err) {
+            console.warn("Failed updating last login:", err);
+          }
+
+          onLoginSuccess(selectedRole);
+          setIsAuthenticating(false);
+          return;
+        }
       }
+
+      setErrorMsg('Autentikasi gagal! Username atau Kata Sandi yang Anda masukkan salah atau peran tidak sesuai.');
+      setIsAuthenticating(false);
     }, 600);
   };
 
@@ -154,7 +229,8 @@ export default function LoginPortal({ onLoginSuccess, defaultRolePreference }: L
         username: cleanRegUser,
         password: regPassword,
         phoneNip: regPhoneNip.trim() || undefined,
-        registeredAt: new Date().toISOString()
+        registeredAt: new Date().toISOString(),
+        status: 'Pending' // Requires verification & approval from operator!
       };
 
       const updated = [newAcc, ...registeredAccounts];
@@ -166,8 +242,8 @@ export default function LoginPortal({ onLoginSuccess, defaultRolePreference }: L
         setDoc(doc(db, 'users', newAcc.id), {
           ...newAcc,
           phoneNip: newAcc.phoneNip || '-',
-          lastLogin: new Date().toISOString(),
-          status: 'Aktif'
+          lastLogin: '-',
+          status: 'Pending'
         });
       } catch (err) {
         console.warn("Failed syncing user account to sheets:", err);
@@ -186,7 +262,7 @@ export default function LoginPortal({ onLoginSuccess, defaultRolePreference }: L
       setUsername(cleanRegUser);
       setPassword(regPassword);
       setActiveTab('LOGIN');
-      setSuccessMsg(`Pendaftaran Akun Berhasil! Akun "${newAcc.fullName}" telah dibuat. Silakan klik tombol "Masuk Akun Kerja".`);
+      setSuccessMsg(`Pendaftaran Akun Berhasil! Akun "${newAcc.fullName}" telah dibuat. STATUS: MENUNGGU VERIFIKASI & PERSETUJUAN dari Operator Desa / Kecamatan. Akun baru dapat digunakan untuk login setelah disetujui.`);
     }, 600);
   };
 

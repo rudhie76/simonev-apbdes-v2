@@ -105,6 +105,22 @@ export type UserRole =
   | 'OP_API_API' 
   | 'OP_KECAMATAN';
 
+export type UserStatus = 'Pending' | 'Aktif' | 'Ditolak';
+
+export interface RegisteredAccount {
+  id: string;
+  fullName: string;
+  role: UserRole;
+  username: string;
+  password?: string;
+  phoneNip?: string;
+  registeredAt: string;
+  lastLogin?: string;
+  status: UserStatus;
+  approvedBy?: string;
+  approvedAt?: string;
+}
+
 export interface Regulation {
   id: string;
   category: 'PUSAT' | 'PROVINSI' | 'KABUPATEN';
