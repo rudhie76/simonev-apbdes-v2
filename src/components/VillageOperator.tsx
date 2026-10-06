@@ -28,7 +28,7 @@ import {
   Filter,
   Camera
 } from 'lucide-react';
-import { handleDownloadFile, handleDownloadPhotoPdf } from '../lib/download';
+import { handleDownloadFile, handleDownloadPhotoPdf, exportActivitiesToExcel } from '../lib/download';
 import { uploadFileToStorage } from '../lib/sheetsApi';
 
 // Client-side image compression helper
@@ -572,6 +572,15 @@ export default function VillageOperator({
           Daftar Rencana Kerja Kegiatan APBDes ({villageActivities.length})
         </h3>
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => exportActivitiesToExcel(villageActivities)}
+            className="flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs md:text-sm rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
+            type="button"
+            title="Ekspor Seluruh Data Desa dalam Format Excel (Siap Copy ke Sheet V2)"
+          >
+            <Download className="w-4 h-4 text-white" />
+            Ekspor Excel (Sheet V2)
+          </button>
           <button
             onClick={onTriggerPrintRecap}
             className="flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs md:text-sm rounded-lg transition-all border border-slate-300 cursor-pointer shadow-xs active:scale-95"

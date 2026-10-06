@@ -281,4 +281,77 @@ REKAPITULASI EVALUASI MODUL 2:
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Exports all activities formatted as a CSV/Excel file matching the exact V2 Google Sheet columns
+ */
+export function exportActivitiesToExcel(activities: Activity[]) {
+  const headers = [
+    'id',
+    'name',
+    'village',
+    'sector',
+    'budgetTotal',
+    'budgetSpent',
+    'progressPhysical',
+    'status',
+    'sourceOfFunds',
+    'photoUrl',
+    'photoName',
+    'budgetReportUrl',
+    'budgetReportName',
+    'incompleteReason',
+    'isKecamatanApproved',
+    'recommendation',
+    'approvedBy',
+    'approvedAt',
+    'lastUpdated',
+    'createdAt',
+    'year'
+  ];
+
+  const escapeCsv = (str: any) => {
+    if (str === undefined || str === null) return '';
+    const val = String(str);
+    if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+      return `"${val.replace(/"/g, '""')}"`;
+    }
+    return val;
+  };
+
+  const rows = activities.map(act => [
+    escapeCsv(act.id),
+    escapeCsv(act.name),
+    escapeCsv(act.village),
+    escapeCsv(act.sector),
+    escapeCsv(act.budgetTotal),
+    escapeCsv(act.budgetSpent),
+    escapeCsv(act.progressPhysical),
+    escapeCsv(act.status),
+    escapeCsv(act.sourceOfFunds || 'Dana Desa (DD)'),
+    escapeCsv(act.photoUrl || ''),
+    escapeCsv(act.photoName || ''),
+    escapeCsv(act.budgetReportUrl || ''),
+    escapeCsv(act.budgetReportName || ''),
+    escapeCsv(act.incompleteReason || ''),
+    escapeCsv(act.isKecamatanApproved ? 'TRUE' : 'FALSE'),
+    escapeCsv(act.recommendation || ''),
+    escapeCsv(act.approvedBy || ''),
+    escapeCsv(act.approvedAt || ''),
+    escapeCsv(act.lastUpdated || ''),
+    escapeCsv(act.createdAt || ''),
+    escapeCsv(act.year || 2026)
+  ].join(','));
+
+  const csvContent = "\uFEFF" + [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `DATA_SIMONEV_FORMAT_EXCEL_SHEET_V2_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 
