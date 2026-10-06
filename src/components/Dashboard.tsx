@@ -596,420 +596,432 @@ export default function Dashboard({
         </div>
       </div>
 
-      {/* Dasbor Utama / Desa: Side-by-Side Grid Layout (Grafik Realisasi + Profil BUMDes) */}
+      {/* ROW 1: Gambar 1 (Profil & Kinerja BUMDes) berdampingan dengan Gambar 2 (Aktivitas Terkini) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-        {/* Visualisasi Recharts Comparison Bar Chart */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden flex flex-col justify-between h-full">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        {/* Gambar 1: Informational & Financial Section: Status & Kinerja BUMDes Setiap Desa */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5 flex flex-col justify-between h-full">
           <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              Perbandingan Realisasi Penyerapan vs Pagu Anggaran per Desa
-            </h3>
-            <p className="text-xs text-slate-550 mt-1">
-              Grafik komparatif real-time yang membandingkan pagu APBDes dengan total realisasi belanja yang telah terserap di masing-masing desa.
-            </p>
-          </div>
-          <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 font-sans self-start sm:self-center">
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 bg-blue-600 rounded-xs"></span>
-              Pagu APBDes
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Store className="w-5 h-5 text-emerald-600" />
+                  Profil & Kinerja BUMDes {effectiveVillage !== 'ALL' ? `Desa ${effectiveVillage}` : `Setiap Desa (${filteredBumdesList.length} Desa)`}
+                </h3>
+                <p className="text-xs text-slate-550 mt-1">
+                  Rangkuman kelembagaan, unit usaha, aset, pendapatan, serta kontribusi PADes BUMDes.
+                </p>
+              </div>
+              {onNavigateToBumdes && (
+                <button
+                  type="button"
+                  onClick={onNavigateToBumdes}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200/80 transition-all cursor-pointer shrink-0 self-start sm:self-center"
+                >
+                  <span>Monev BUMDes</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 bg-emerald-500 rounded-xs"></span>
-              Realisasi Penyerapan
-            </div>
+
+            {filteredBumdesList.length === 0 ? (
+              <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-4">
+                <Store className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-xs text-slate-500 font-semibold">Belum ada data Monev BUMDes untuk wilayah yang dipilih.</p>
+              </div>
+            ) : (
+              <div className={`grid grid-cols-1 ${filteredBumdesList.length === 1 ? 'grid-cols-1' : 'md:grid-cols-1 lg:grid-cols-1'} gap-6 mt-4`}>
+                {filteredBumdesList.map((item) => {
+                  const isSehat = item.healthScore === 'Sehat/Berkembang';
+                  const isPembinaan = item.healthScore === 'Perlu Pembinaan';
+                  const healthBadgeClass = isSehat 
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                    : isPembinaan 
+                      ? 'bg-amber-100 text-amber-800 border-amber-300' 
+                      : 'bg-rose-100 text-rose-800 border-rose-300';
+
+                  const activeUnits = (item.units || []).filter(u => u.status === 'Aktif Beroperasi');
+                  const totalUnits = (item.units || []).length;
+                  const photos = item.musdesPhotos && item.musdesPhotos.length > 0 
+                    ? item.musdesPhotos 
+                    : (item.musdesPhotoUrl ? [item.musdesPhotoUrl] : []);
+
+                  return (
+                    <div 
+                      key={item.id} 
+                      className="bg-slate-50/60 border border-slate-200 rounded-xl p-5 space-y-4 hover:shadow-md transition-all flex flex-col justify-between"
+                    >
+                      <div className="space-y-3">
+                        {/* Top Header: Village & Health Badge */}
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-slate-700 bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-2xs">
+                            <MapPin className="w-3 h-3 text-blue-600" />
+                            Desa {item.village}
+                          </span>
+                          <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${healthBadgeClass}`}>
+                            {item.healthScore || 'Belum Dievaluasi'}
+                          </span>
+                        </div>
+
+                        {/* BUMDes Name & Director */}
+                        <div>
+                          <h4 className="text-base font-extrabold text-slate-900 leading-snug">
+                            {item.bumdesName || `BUMDes ${item.village}`}
+                          </h4>
+                          <div className="flex items-center gap-2 text-xs text-slate-500 mt-1 flex-wrap">
+                            <span className="flex items-center gap-1">
+                              <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                              Direktur: <strong className="text-slate-700">{item.directorName || '-'}</strong>
+                            </span>
+                            <span>•</span>
+                            <span className="font-mono text-[11px]">Berdiri {item.establishedYear || '-'}</span>
+                          </div>
+                        </div>
+
+                        {/* Legal Status */}
+                        <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200 text-xs">
+                          <span className="text-slate-500 font-medium">Badan Hukum:</span>
+                          <span className={`font-bold flex items-center gap-1 ${
+                            item.lawStatus === 'Sudah Terbit' ? 'text-emerald-700' : 'text-amber-700'
+                          }`}>
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            {item.lawStatus || 'Belum Ada'}
+                          </span>
+                        </div>
+
+                        {/* 4 Financial Key Metrics */}
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="p-2.5 bg-white rounded-lg border border-slate-150">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Aset</p>
+                            <p className="font-extrabold text-slate-800 font-mono mt-0.5">{formatRupiah(item.totalAssets || 0)}</p>
+                          </div>
+                          <div className="p-2.5 bg-white rounded-lg border border-slate-150">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pendapatan/Omset</p>
+                            <p className="font-extrabold text-slate-800 font-mono mt-0.5">{formatRupiah(item.totalRevenue || 0)}</p>
+                          </div>
+                          <div className="p-2.5 bg-emerald-50/50 rounded-lg border border-emerald-100">
+                            <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Laba Bersih</p>
+                            <p className="font-extrabold text-emerald-800 font-mono mt-0.5">{formatRupiah(item.netProfit || 0)}</p>
+                          </div>
+                          <div className="p-2.5 bg-blue-50/50 rounded-lg border border-blue-100">
+                            <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Setoran PADes</p>
+                            <p className="font-extrabold text-blue-800 font-mono mt-0.5">{formatRupiah(item.padesContribution || 0)}</p>
+                          </div>
+                        </div>
+
+                        {/* Business Units List */}
+                        <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                              <Store className="w-3.5 h-3.5 text-blue-600" />
+                              Unit Usaha ({totalUnits})
+                            </span>
+                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              {activeUnits.length} Aktif Beroperasi
+                            </span>
+                          </div>
+                          {totalUnits === 0 ? (
+                            <p className="text-[11px] text-slate-400 italic">Belum ada unit usaha terdaftar.</p>
+                          ) : (
+                            <div className="space-y-1.5 pt-1">
+                              {item.units.map((unit) => (
+                                <div key={unit.id} className="flex items-center justify-between text-[11px] bg-slate-50 p-2 rounded-md border border-slate-100">
+                                  <span className="font-medium text-slate-800 truncate max-w-[170px]">{unit.name}</span>
+                                  <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                                    unit.financialCondition === 'Untung' ? 'bg-emerald-100 text-emerald-800' :
+                                    unit.financialCondition === 'Impas' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-rose-100 text-rose-800'
+                                  }`}>
+                                    {unit.financialCondition}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Local Workforce & UMKM */}
+                        <div className="flex items-center justify-between text-[11px] text-slate-600 px-1 font-medium">
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3.5 h-3.5 text-slate-400" />
+                            Tenaga Kerja: <strong className="text-slate-800">{item.totalEmployees || 0} Orang</strong>
+                          </span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <Award className="w-3.5 h-3.5 text-slate-400" />
+                            UMKM Binaan: <strong className="text-slate-800">{item.assistedUmkm || 0} Usaha</strong>
+                          </span>
+                        </div>
+
+                        {/* Photos Thumbnail Preview */}
+                        {photos.length > 0 && (
+                          <div className="space-y-1 pt-1">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                              <ImageIcon className="w-3 h-3 text-blue-500" /> Dokumentasi Musdes ({photos.length} Foto):
+                            </p>
+                            <div className="flex gap-1.5 overflow-x-auto pb-1">
+                              {photos.map((pUrl, pIdx) => (
+                                <img
+                                  key={pIdx}
+                                  src={pUrl}
+                                  alt={`Dokumentasi Musdes ${item.village}`}
+                                  referrerPolicy="no-referrer"
+                                  className="w-14 h-11 object-cover rounded-md border border-slate-200 shadow-2xs shrink-0"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Navigation CTA */}
+                      {onNavigateToBumdes && (
+                        <button
+                          type="button"
+                          onClick={onNavigateToBumdes}
+                          className="w-full mt-3 py-2 bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                        >
+                          <span>Lihat Rincian & Laporan PDF</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="w-full h-[320px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <RechartsBarChart
-              data={chartData}
-              margin={{ top: 10, right: 10, left: 10, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis 
-                dataKey="name" 
-                stroke="#64748b" 
-                fontSize={12} 
-                fontWeight={600} 
-                tickLine={false} 
-                axisLine={false} 
-              />
-              <YAxis 
-                stroke="#64748b" 
-                fontSize={10} 
-                fontWeight={500}
-                tickLine={false} 
-                axisLine={false} 
-                tickFormatter={formatYAxis} 
-              />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(59, 130, 246, 0.04)' }} />
-              <Bar dataKey="Pagu" fill="#2563eb" radius={[6, 6, 0, 0]} name="Pagu APBDes" barSize={36} />
-              <Bar dataKey="Realisasi" fill="#10b981" radius={[6, 6, 0, 0]} name="Realisasi Penyerapan" barSize={36} />
-            </RechartsBarChart>
-          </ResponsiveContainer>
+        {/* Gambar 2: Right Widget: Real-time Update Logs (Aktivitas Terkini) */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between h-full">
+          <div>
+            <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-4">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-blue-500" />
+                Aktivitas Terkini
+              </h3>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
+                Live Feed
+              </span>
+            </div>
+
+            <div className="overflow-y-auto space-y-4 max-h-[500px] pr-1">
+              {filteredLogs.length === 0 ? (
+                <p className="text-slate-400 text-sm text-center py-8">Belum ada pembaruan log untuk wilayah ini.</p>
+              ) : (
+                filteredLogs.map((log) => (
+                  <div key={log.id} className="p-3 bg-slate-50 hover:bg-slate-100/70 transition-colors rounded-xl border border-slate-200/50 relative overflow-hidden flex gap-3">
+                    <div className={`w-1 absolute left-0 top-0 bottom-0 ${
+                      log.type === 'approval' ? 'bg-emerald-500' :
+                      log.type === 'success' ? 'bg-blue-500' :
+                      log.type === 'warn' ? 'bg-amber-500' : 'bg-slate-400'
+                    }`} />
+                    
+                    <div className="space-y-1 pl-1 flex-1">
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="text-xs font-bold text-slate-800">{log.title}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {new Date(log.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 line-clamp-2 md:line-clamp-3">{log.description}</p>
+                      {log.village && (
+                        <span className="inline-block text-[9px] px-2 py-0.5 bg-slate-200/80 text-slate-700 font-semibold rounded-sm font-sans mt-1">
+                          Desa {log.village}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Informational & Financial Section: Status & Kinerja BUMDes Setiap Desa */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5 flex flex-col justify-between h-full">
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-            <div>
+      {/* ROW 2: Gambar 3 (Perbandingan Realisasi vs Pagu) berdampingan dengan Gambar 4 (Kinerja Bidang APBDes) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        {/* Gambar 3: Visualisasi Recharts Comparison Bar Chart */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden flex flex-col justify-between h-full">
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-blue-600" />
+                  Perbandingan Realisasi Penyerapan vs Pagu Anggaran per Desa
+                </h3>
+                <p className="text-xs text-slate-550 mt-1">
+                  Grafik komparatif real-time yang membandingkan pagu APBDes dengan total realisasi belanja yang telah terserap di masing-masing desa.
+                </p>
+              </div>
+              <div className="flex items-center gap-4 text-xs font-semibold text-slate-600 font-sans self-start sm:self-center shrink-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 bg-blue-600 rounded-xs"></span>
+                  Pagu APBDes
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 bg-emerald-500 rounded-xs"></span>
+                  Realisasi Penyerapan
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full h-[320px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsBarChart
+                  data={chartData}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#64748b" 
+                    fontSize={12} 
+                    fontWeight={600} 
+                    tickLine={false} 
+                    axisLine={false} 
+                  />
+                  <YAxis 
+                    stroke="#64748b" 
+                    fontSize={10} 
+                    fontWeight={500}
+                    tickLine={false} 
+                    axisLine={false} 
+                    tickFormatter={formatYAxis} 
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(59, 130, 246, 0.04)' }} />
+                  <Bar dataKey="Pagu" fill="#2563eb" radius={[6, 6, 0, 0]} name="Pagu APBDes" barSize={36} />
+                  <Bar dataKey="Realisasi" fill="#10b981" radius={[6, 6, 0, 0]} name="Realisasi Penyerapan" barSize={36} />
+                </RechartsBarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Gambar 4: Sectoral Allocations visual custom chart (Kinerja Bidang APBDes) */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between h-full">
+          <div>
+            <div className="border-b border-slate-100 pb-4 mb-6">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Store className="w-5 h-5 text-emerald-600" />
-                Profil & Kinerja BUMDes {effectiveVillage !== 'ALL' ? `Desa ${effectiveVillage}` : `Setiap Desa (${filteredBumdesList.length} Desa)`}
+                <FileSpreadsheet className="w-5 h-5 text-blue-500" />
+                Kinerja Bidang APBDes (Penyerapan Anggaran Kegiatan)
               </h3>
               <p className="text-xs text-slate-550 mt-1">
-                Rangkuman kelembagaan, unit usaha, aset, pendapatan, serta kontribusi PADes BUMDes.
+                Persentase realisasi penyerapan anggaran per bidang usulan APBDes.
               </p>
             </div>
-            {onNavigateToBumdes && (
-              <button
-                type="button"
-                onClick={onNavigateToBumdes}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200/80 transition-all cursor-pointer shrink-0 self-start sm:self-center"
-              >
-                <span>Monev BUMDes</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
 
-          {filteredBumdesList.length === 0 ? (
-            <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-4">
-              <Store className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-              <p className="text-xs text-slate-500 font-semibold">Belum ada data Monev BUMDes untuk wilayah yang dipilih.</p>
-            </div>
-          ) : (
-            <div className={`grid grid-cols-1 ${filteredBumdesList.length === 1 ? 'grid-cols-1' : 'md:grid-cols-1 lg:grid-cols-1'} gap-6 mt-4`}>
-            {filteredBumdesList.map((item) => {
-              const isSehat = item.healthScore === 'Sehat/Berkembang';
-              const isPembinaan = item.healthScore === 'Perlu Pembinaan';
-              const healthBadgeClass = isSehat 
-                ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
-                : isPembinaan 
-                  ? 'bg-amber-100 text-amber-800 border-amber-300' 
-                  : 'bg-rose-100 text-rose-800 border-rose-300';
-
-              const activeUnits = (item.units || []).filter(u => u.status === 'Aktif Beroperasi');
-              const totalUnits = (item.units || []).length;
-              const photos = item.musdesPhotos && item.musdesPhotos.length > 0 
-                ? item.musdesPhotos 
-                : (item.musdesPhotoUrl ? [item.musdesPhotoUrl] : []);
-
-              return (
-                <div 
-                  key={item.id} 
-                  className="bg-slate-50/60 border border-slate-200 rounded-xl p-5 space-y-4 hover:shadow-md transition-all flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    {/* Top Header: Village & Health Badge */}
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-slate-700 bg-white px-2.5 py-1 rounded-md border border-slate-200 shadow-2xs">
-                        <MapPin className="w-3 h-3 text-blue-600" />
-                        Desa {item.village}
-                      </span>
-                      <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${healthBadgeClass}`}>
-                        {item.healthScore || 'Belum Dievaluasi'}
-                      </span>
-                    </div>
-
-                    {/* BUMDes Name & Director */}
-                    <div>
-                      <h4 className="text-base font-extrabold text-slate-900 leading-snug">
-                        {item.bumdesName || `BUMDes ${item.village}`}
-                      </h4>
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-1 flex-wrap">
-                        <span className="flex items-center gap-1">
-                          <Briefcase className="w-3.5 h-3.5 text-slate-400" />
-                          Direktur: <strong className="text-slate-700">{item.directorName || '-'}</strong>
-                        </span>
-                        <span>•</span>
-                        <span className="font-mono text-[11px]">Berdiri {item.establishedYear || '-'}</span>
-                      </div>
-                    </div>
-
-                    {/* Legal Status */}
-                    <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200 text-xs">
-                      <span className="text-slate-500 font-medium">Badan Hukum:</span>
-                      <span className={`font-bold flex items-center gap-1 ${
-                        item.lawStatus === 'Sudah Terbit' ? 'text-emerald-700' : 'text-amber-700'
-                      }`}>
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        {item.lawStatus || 'Belum Ada'}
-                      </span>
-                    </div>
-
-                    {/* 4 Financial Key Metrics */}
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2.5 bg-white rounded-lg border border-slate-150">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Aset</p>
-                        <p className="font-extrabold text-slate-800 font-mono mt-0.5">{formatRupiah(item.totalAssets || 0)}</p>
-                      </div>
-                      <div className="p-2.5 bg-white rounded-lg border border-slate-150">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pendapatan/Omset</p>
-                        <p className="font-extrabold text-slate-800 font-mono mt-0.5">{formatRupiah(item.totalRevenue || 0)}</p>
-                      </div>
-                      <div className="p-2.5 bg-emerald-50/50 rounded-lg border border-emerald-100">
-                        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Laba Bersih</p>
-                        <p className="font-extrabold text-emerald-800 font-mono mt-0.5">{formatRupiah(item.netProfit || 0)}</p>
-                      </div>
-                      <div className="p-2.5 bg-blue-50/50 rounded-lg border border-blue-100">
-                        <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Setoran PADes</p>
-                        <p className="font-extrabold text-blue-800 font-mono mt-0.5">{formatRupiah(item.padesContribution || 0)}</p>
-                      </div>
-                    </div>
-
-                    {/* Business Units List */}
-                    <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-slate-700 flex items-center gap-1.5">
-                          <Store className="w-3.5 h-3.5 text-blue-600" />
-                          Unit Usaha ({totalUnits})
-                        </span>
-                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                          {activeUnits.length} Aktif Beroperasi
-                        </span>
-                      </div>
-                      {totalUnits === 0 ? (
-                        <p className="text-[11px] text-slate-400 italic">Belum ada unit usaha terdaftar.</p>
-                      ) : (
-                        <div className="space-y-1.5 pt-1">
-                          {item.units.map((unit) => (
-                            <div key={unit.id} className="flex items-center justify-between text-[11px] bg-slate-50 p-2 rounded-md border border-slate-100">
-                              <span className="font-medium text-slate-800 truncate max-w-[170px]">{unit.name}</span>
-                              <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                                unit.financialCondition === 'Untung' ? 'bg-emerald-100 text-emerald-800' :
-                                unit.financialCondition === 'Impas' ? 'bg-blue-100 text-blue-800' :
-                                'bg-rose-100 text-rose-800'
-                              }`}>
-                                {unit.financialCondition}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Local Workforce & UMKM */}
-                    <div className="flex items-center justify-between text-[11px] text-slate-600 px-1 font-medium">
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 text-slate-400" />
-                        Tenaga Kerja: <strong className="text-slate-800">{item.totalEmployees || 0} Orang</strong>
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Award className="w-3.5 h-3.5 text-slate-400" />
-                        UMKM Binaan: <strong className="text-slate-800">{item.assistedUmkm || 0} Usaha</strong>
-                      </span>
-                    </div>
-
-                    {/* Photos Thumbnail Preview */}
-                    {photos.length > 0 && (
-                      <div className="space-y-1 pt-1">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                          <ImageIcon className="w-3 h-3 text-blue-500" /> Dokumentasi Musdes ({photos.length} Foto):
-                        </p>
-                        <div className="flex gap-1.5 overflow-x-auto pb-1">
-                          {photos.map((pUrl, pIdx) => (
-                            <img
-                              key={pIdx}
-                              src={pUrl}
-                              alt={`Dokumentasi Musdes ${item.village}`}
-                              referrerPolicy="no-referrer"
-                              className="w-14 h-11 object-cover rounded-md border border-slate-200 shadow-2xs shrink-0"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Navigation CTA */}
-                  {onNavigateToBumdes && (
-                    <button
-                      type="button"
-                      onClick={onNavigateToBumdes}
-                      className="w-full mt-3 py-2 bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-                    >
-                      <span>Lihat Rincian & Laporan PDF</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-        </div>
-      </div>
-    </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Widget: Village Performance Bento Cards */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-          <h3 className="text-base font-bold text-slate-900 mb-5 flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-blue-500" />
-            Status Keuangan & Fisik Desa Se-Kecamatan Waru
-          </h3>
-
-          <div className="space-y-5">
-            {villageStats.map(v => {
-              const absorptionRate = v.totalBudget > 0 ? Math.round((v.spent / v.totalBudget) * 100) : 0;
-              return (
-                <div key={v.name} className="p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                    <div>
-                      <h4 className="font-semibold text-slate-900 text-sm sm:text-base">Desa {v.name}</h4>
-                      <p className="text-xs text-slate-500">{v.count} total usulan terencana</p>
-                    </div>
-                    <div className="text-left sm:text-right">
-                      <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">Pagu APBDes</div>
-                      <div className="text-xs sm:text-sm font-bold text-slate-900 font-mono">{formatRupiah(v.totalBudget)}</div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Budget Absorption */}
-                    <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100">
-                      <div className="flex justify-between items-center text-xs text-slate-600 mb-1.5">
-                        <span className="flex items-center gap-1.5 font-semibold">
-                          <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
-                          Penyerapan Dana
-                        </span>
-                        <span className="font-bold text-emerald-700 font-mono">{absorptionRate}%</span>
-                      </div>
-                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-emerald-500 h-full rounded-full transition-all duration-500"
-                          style={{ width: `${Math.min(absorptionRate, 100)}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
-                        <span>{formatRupiah(v.spent)}</span>
-                        <span>realisasi</span>
-                      </div>
-                    </div>
-
-                    {/* Physical Progress */}
-                    <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100">
-                      <div className="flex justify-between items-center text-xs text-slate-600 mb-1.5">
-                        <span className="flex items-center gap-1.5 font-semibold">
-                          <ActivityIcon className="w-3.5 h-3.5 text-amber-500" />
-                          Progres Fisik Rata-rata
-                        </span>
-                        <span className="font-bold text-amber-600 font-mono">{v.progress}%</span>
-                      </div>
-                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-amber-400 h-full rounded-full transition-all duration-500"
-                          style={{ width: `${v.progress}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
-                        <span>{v.completedCount} / {v.count} Selesai</span>
-                        <span>kegiatan</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right Widget: Real-time Update Logs */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col h-full">
-          <div className="flex items-center justify-between mb-5">
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-500" />
-              Aktivitas Terkini
-            </h3>
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700">
-              Live Feed
-            </span>
-          </div>
-
-          <div className="flex-1 overflow-y-auto space-y-4 max-h-[380px] pr-1">
-            {filteredLogs.length === 0 ? (
-              <p className="text-slate-400 text-sm text-center py-8">Belum ada pembaruan log untuk wilayah ini.</p>
+            {sectorData.length === 0 ? (
+              <p className="text-slate-400 text-sm py-4 text-center">Belum ada usulan kegiatan di bidang APBDes.</p>
             ) : (
-              filteredLogs.map((log) => (
-                <div key={log.id} className="p-3 bg-slate-50 hover:bg-slate-100/70 transition-colors rounded-xl border border-slate-200/50 relative overflow-hidden flex gap-3">
-                  <div className={`w-1 absolute left-0 top-0 bottom-0 ${
-                    log.type === 'approval' ? 'bg-emerald-500' :
-                    log.type === 'success' ? 'bg-blue-500' :
-                    log.type === 'warn' ? 'bg-amber-500' : 'bg-slate-400'
-                  }`} />
-                  
-                  <div className="space-y-1 pl-1 flex-1">
-                    <div className="flex justify-between items-start gap-2">
-                      <span className="text-xs font-bold text-slate-800">{log.title}</span>
-                      <span className="text-[10px] text-slate-400 font-mono">
-                        {new Date(log.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+              <div className="space-y-4">
+                {sectorData.map(sector => (
+                  <div key={sector.name} className="space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm gap-1">
+                      <div className="font-semibold text-slate-800 flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-sm bg-blue-600 inline-block"></span>
+                        {sector.name} <span className="font-normal text-slate-400 font-mono">({sector.count} usulan)</span>
+                      </div>
+                      <div className="flex items-center gap-3 font-mono text-xs text-slate-600">
+                        <span>Realisasi: <strong className="text-slate-900">{formatRupiah(sector.spent)}</strong></span>
+                        <span className="text-slate-300">|</span>
+                        <span>Pagu: <strong className="text-slate-900">{formatRupiah(sector.budget)}</strong></span>
+                        <span className="text-slate-300">|</span>
+                        <span className="text-blue-600 font-bold">{sector.percent}%</span>
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-600 line-clamp-2 md:line-clamp-3">{log.description}</p>
-                    {log.village && (
-                      <span className="inline-block text-[9px] px-2 py-0.5 bg-slate-200/80 text-slate-700 font-semibold rounded-sm font-sans mt-1">
-                        Desa {log.village}
-                      </span>
-                    )}
+                    <div className="relative">
+                      <div className="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden border border-slate-200/50">
+                        <div 
+                          className="bg-blue-600 h-full rounded-full transition-all duration-500 relative"
+                          style={{ width: `${Math.min(sector.percent, 100)}%` }}
+                        >
+                          {sector.percent > 15 && (
+                            <span className="absolute inset-y-0 right-2 flex items-center text-[9px] font-bold text-white font-mono">
+                              {sector.percent}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Sectoral Allocations visual custom chart (CSS Area grid) */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 className="text-base font-bold text-slate-900 mb-6 flex items-center gap-2">
-          <FileSpreadsheet className="w-5 h-5 text-blue-500" />
-          Kinerja Bidang APBDes (Penyerapan Anggaran Kegiatan)
+      {/* Village Performance Bento Cards (Status Keuangan & Fisik Desa Se-Kecamatan Waru) */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <h3 className="text-base font-bold text-slate-900 mb-5 flex items-center gap-2">
+          <Building2 className="w-5 h-5 text-blue-500" />
+          Status Keuangan & Fisik Desa Se-Kecamatan Waru
         </h3>
 
-        {sectorData.length === 0 ? (
-          <p className="text-slate-400 text-sm py-4 text-center">Belum ada usulan kegiatan di bidang APBDes.</p>
-        ) : (
-          <div className="space-y-4">
-            {sectorData.map(sector => (
-              <div key={sector.name} className="space-y-2">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm gap-1">
-                  <div className="font-semibold text-slate-800 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-blue-600 inline-block"></span>
-                    {sector.name} <span className="font-normal text-slate-400 font-mono">({sector.count} usulan)</span>
+        <div className="space-y-5">
+          {villageStats.map(v => {
+            const absorptionRate = v.totalBudget > 0 ? Math.round((v.spent / v.totalBudget) * 100) : 0;
+            return (
+              <div key={v.name} className="p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                  <div>
+                    <h4 className="font-semibold text-slate-900 text-sm sm:text-base">Desa {v.name}</h4>
+                    <p className="text-xs text-slate-550">{v.count} total usulan terencana</p>
                   </div>
-                  <div className="flex items-center gap-3 font-mono text-xs text-slate-600">
-                    <span>Realisasi: <strong className="text-slate-900">{formatRupiah(sector.spent)}</strong></span>
-                    <span className="text-slate-300">|</span>
-                    <span>Pagu: <strong className="text-slate-900">{formatRupiah(sector.budget)}</strong></span>
-                    <span className="text-slate-300">|</span>
-                    <span className="text-blue-600 font-bold">{sector.percent}%</span>
+                  <div className="text-left sm:text-right">
+                    <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">Pagu APBDes</div>
+                    <div className="text-xs sm:text-sm font-bold text-slate-900 font-mono">{formatRupiah(v.totalBudget)}</div>
                   </div>
                 </div>
-                <div className="relative">
-                  <div className="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden border border-slate-200/50">
-                    <div 
-                       className="bg-blue-600 h-full rounded-full transition-all duration-500 relative"
-                      style={{ width: `${Math.min(sector.percent, 100)}%` }}
-                    >
-                      {sector.percent > 15 && (
-                        <span className="absolute inset-y-0 right-2 flex items-center text-[9px] font-bold text-white font-mono">
-                          {sector.percent}%
-                        </span>
-                      )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Budget Absorption */}
+                  <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+                    <div className="flex justify-between items-center text-xs text-slate-600 mb-1.5">
+                      <span className="flex items-center gap-1.5 font-semibold">
+                        <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
+                        Penyerapan Dana
+                      </span>
+                      <span className="font-bold text-emerald-700 font-mono">{absorptionRate}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(absorptionRate, 100)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
+                      <span>{formatRupiah(v.spent)}</span>
+                      <span>realisasi</span>
+                    </div>
+                  </div>
+
+                  {/* Physical Progress */}
+                  <div className="bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+                    <div className="flex justify-between items-center text-xs text-slate-600 mb-1.5">
+                      <span className="flex items-center gap-1.5 font-semibold">
+                        <ActivityIcon className="w-3.5 h-3.5 text-amber-500" />
+                        Progres Fisik Rata-rata
+                      </span>
+                      <span className="font-bold text-amber-600 font-mono">{v.progress}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                      <div 
+                        className="bg-amber-400 h-full rounded-full transition-all duration-500"
+                        style={{ width: `${v.progress}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
+                      <span>{v.completedCount} / {v.count} Selesai</span>
+                      <span>kegiatan</span>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
 
       {/* Main Table & List Section */}
