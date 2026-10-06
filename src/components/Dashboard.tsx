@@ -89,10 +89,12 @@ export default function Dashboard({
     setSelectedVillage(userVillage);
   }, [userVillage]);
 
+  const effectiveVillage = userVillage !== 'ALL' ? userVillage : selectedVillage;
+
   // 1. Filtered activities for current display or metric views
   const filteredActivities = useMemo(() => {
     return activities.filter(act => {
-      const matchVillage = selectedVillage === 'ALL' || act.village === selectedVillage;
+      const matchVillage = effectiveVillage === 'ALL' || act.village === effectiveVillage;
       const matchSector = selectedSector === 'ALL' || act.sector === selectedSector;
       const matchStatus = selectedStatus === 'ALL' || act.status === selectedStatus;
       const matchSource = selectedSourceOfFunds === 'ALL' || (act.sourceOfFunds || 'Dana Desa (DD)') === selectedSourceOfFunds;
@@ -107,16 +109,16 @@ export default function Dashboard({
                           (act.incompleteReason || '').toLowerCase().includes(searchQuery.toLowerCase());
       return matchVillage && matchSector && matchStatus && matchSource && matchPhysical && matchSearch;
     });
-  }, [activities, selectedVillage, selectedSector, selectedStatus, selectedSourceOfFunds, selectedPhysical, searchQuery]);
+  }, [activities, effectiveVillage, selectedSector, selectedStatus, selectedSourceOfFunds, selectedPhysical, searchQuery]);
 
   // 2. Metrics calculation
   const stats = useMemo(() => {
     let targetActivities = activities;
     let targetBudgets = Object.values(villageBudgets).reduce((a, b) => a + b, 0);
 
-    if (selectedVillage !== 'ALL') {
-      targetActivities = activities.filter(a => a.village === selectedVillage);
-      targetBudgets = villageBudgets[selectedVillage];
+    if (effectiveVillage !== 'ALL') {
+      targetActivities = activities.filter(a => a.village === effectiveVillage);
+      targetBudgets = villageBudgets[effectiveVillage] || 0;
     }
 
     const totalActivities = targetActivities.length;
@@ -160,7 +162,7 @@ export default function Dashboard({
       totalBudgetAbsorptionRate,
       allocatedBudgetAbsorptionRate
     };
-  }, [activities, selectedVillage, villageBudgets]);
+  }, [activities, effectiveVillage, villageBudgets]);
 
   // Format currency in Rupiah
   const formatRupiah = (value: number) => {
@@ -208,7 +210,7 @@ export default function Dashboard({
   // Calculation per Village for bento tiles
   const villageStats = useMemo(() => {
     const allVillages: Village[] = ['Bangun Mulya', 'Sesulu', 'Api-api'];
-    const targetVillages: Village[] = selectedVillage === 'ALL' ? allVillages : [selectedVillage];
+    const targetVillages: Village[] = effectiveVillage === 'ALL' ? allVillages : [effectiveVillage];
 
     const list = targetVillages.map(vName => ({
       name: vName,
@@ -228,7 +230,7 @@ export default function Dashboard({
     });
 
     return list;
-  }, [activities, villageBudgets, selectedVillage]);
+  }, [activities, villageBudgets, effectiveVillage]);
 
   // Chart data formatted specifically for Recharts comparison
   const chartData = useMemo(() => {
@@ -241,9 +243,9 @@ export default function Dashboard({
 
   // Filter notification logs for active village selection
   const filteredLogs = useMemo(() => {
-    if (selectedVillage === 'ALL') return notificationLogs;
-    return notificationLogs.filter(log => !log.village || log.village === selectedVillage);
-  }, [notificationLogs, selectedVillage]);
+    if (effectiveVillage === 'ALL') return notificationLogs;
+    return notificationLogs.filter(log => !log.village || log.village === effectiveVillage);
+  }, [notificationLogs, effectiveVillage]);
 
   // Format Helper for Y-Axis values to Indonesian financial notation (Milyar / Juta)
   const formatYAxis = (value: number) => {
@@ -294,7 +296,7 @@ export default function Dashboard({
   // Sector breakdown calculations
   const sectorData = useMemo(() => {
     const sectors: Record<string, { budget: number; spent: number; count: number }> = {};
-    const targetActs = selectedVillage === 'ALL' ? activities : activities.filter(a => a.village === selectedVillage);
+    const targetActs = effectiveVillage === 'ALL' ? activities : activities.filter(a => a.village === effectiveVillage);
     targetActs.forEach(act => {
       if (!sectors[act.sector]) {
         sectors[act.sector] = { budget: 0, spent: 0, count: 0 };
@@ -309,14 +311,14 @@ export default function Dashboard({
       ...data,
       percent: data.budget > 0 ? Math.round((data.spent / data.budget) * 100) : 0
     }));
-  }, [activities, selectedVillage]);
+  }, [activities, effectiveVillage]);
 
   // Filtered BUMDes entries based on village filter
   const filteredBumdesList = useMemo(() => {
     if (!bumdesList || bumdesList.length === 0) return [];
-    if (selectedVillage === 'ALL') return bumdesList;
-    return bumdesList.filter(b => b.village === selectedVillage);
-  }, [bumdesList, selectedVillage]);
+    if (effectiveVillage === 'ALL') return bumdesList;
+    return bumdesList.filter(b => b.village === effectiveVillage);
+  }, [bumdesList, effectiveVillage]);
 
   return (
     <div id="simonev-dashboard-root" className="space-y-8">
@@ -997,17 +999,26 @@ export default function Dashboard({
 
             {/* Filter Desa */}
             <div className="relative">
-              <select
-                value={selectedVillage}
-                onChange={(e) => setSelectedVillage(e.target.value as Village | 'ALL')}
-                className="w-full pl-3 pr-8 py-2 text-sm bg-slate-50/50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 appearance-none font-semibold text-slate-700"
-              >
-                <option value="ALL">Semua Desa (Bangun Mulya, Sesulu, Api-api)</option>
-                <option value="Bangun Mulya">Desa Bangun Mulya</option>
-                <option value="Sesulu">Desa Sesulu</option>
-                <option value="Api-api">Desa Api-api</option>
-              </select>
-              <Filter className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              {userVillage !== 'ALL' ? (
+                <div className="w-full pl-3 pr-3 py-2 text-sm bg-slate-100 border border-slate-300 rounded-lg font-semibold text-slate-700 flex items-center justify-between">
+                  <span className="truncate">Desa {userVillage}</span>
+                  <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold shrink-0">Terkunci</span>
+                </div>
+              ) : (
+                <>
+                  <select
+                    value={selectedVillage}
+                    onChange={(e) => setSelectedVillage(e.target.value as Village | 'ALL')}
+                    className="w-full pl-3 pr-8 py-2 text-sm bg-slate-50/50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 appearance-none font-semibold text-slate-700"
+                  >
+                    <option value="ALL">Semua Desa (Bangun Mulya, Sesulu, Api-api)</option>
+                    <option value="Bangun Mulya">Desa Bangun Mulya</option>
+                    <option value="Sesulu">Desa Sesulu</option>
+                    <option value="Api-api">Desa Api-api</option>
+                  </select>
+                  <Filter className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </>
+              )}
             </div>
 
             {/* Filter Bidang / Sektor */}
