@@ -596,8 +596,10 @@ export default function Dashboard({
         </div>
       </div>
 
-      {/* Visualisasi Recharts Comparison Bar Chart */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden">
+      {/* Dasbor Utama / Desa: Side-by-Side Grid Layout (Grafik Realisasi + Profil BUMDes) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        {/* Visualisasi Recharts Comparison Bar Chart */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs relative overflow-hidden flex flex-col justify-between h-full">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -652,36 +654,37 @@ export default function Dashboard({
       </div>
 
       {/* Informational & Financial Section: Status & Kinerja BUMDes Setiap Desa */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Store className="w-5 h-5 text-emerald-600" />
-              Profil & Kinerja BUMDes Setiap Desa ({filteredBumdesList.length} Desa)
-            </h3>
-            <p className="text-xs text-slate-550 mt-1">
-              Rangkuman perkembangan kelembagaan, unit usaha, aset, pendapatan, serta kontribusi PADes BUMDes terdaftar di Kecamatan Waru.
-            </p>
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5 flex flex-col justify-between h-full">
+        <div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Store className="w-5 h-5 text-emerald-600" />
+                Profil & Kinerja BUMDes {effectiveVillage !== 'ALL' ? `Desa ${effectiveVillage}` : `Setiap Desa (${filteredBumdesList.length} Desa)`}
+              </h3>
+              <p className="text-xs text-slate-550 mt-1">
+                Rangkuman kelembagaan, unit usaha, aset, pendapatan, serta kontribusi PADes BUMDes.
+              </p>
+            </div>
+            {onNavigateToBumdes && (
+              <button
+                type="button"
+                onClick={onNavigateToBumdes}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200/80 transition-all cursor-pointer shrink-0 self-start sm:self-center"
+              >
+                <span>Monev BUMDes</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
-          {onNavigateToBumdes && (
-            <button
-              type="button"
-              onClick={onNavigateToBumdes}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200/80 transition-all cursor-pointer shrink-0 self-start sm:self-center"
-            >
-              <span>Detail Monev BUMDes Lengkap</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
 
-        {filteredBumdesList.length === 0 ? (
-          <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-            <Store className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-xs text-slate-500 font-semibold">Belum ada data Monev BUMDes untuk wilayah yang dipilih.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredBumdesList.length === 0 ? (
+            <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 mt-4">
+              <Store className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-xs text-slate-500 font-semibold">Belum ada data Monev BUMDes untuk wilayah yang dipilih.</p>
+            </div>
+          ) : (
+            <div className={`grid grid-cols-1 ${filteredBumdesList.length === 1 ? 'grid-cols-1' : 'md:grid-cols-1 lg:grid-cols-1'} gap-6 mt-4`}>
             {filteredBumdesList.map((item) => {
               const isSehat = item.healthScore === 'Sehat/Berkembang';
               const isPembinaan = item.healthScore === 'Perlu Pembinaan';
@@ -841,7 +844,9 @@ export default function Dashboard({
             })}
           </div>
         )}
+        </div>
       </div>
+    </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Widget: Village Performance Bento Cards */}
