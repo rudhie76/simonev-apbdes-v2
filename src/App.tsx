@@ -1592,12 +1592,10 @@ export default function App() {
                   )}
                 </button>
               )}
-              <button 
-                onClick={() => window.print()}
-                className="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-700 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                Cetakan Laporan
-              </button>
+              <div className="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-xs flex items-center gap-1.5 border border-blue-700">
+                <User className="w-3.5 h-3.5 text-blue-200 shrink-0" />
+                <span>{activeRole === 'PUBLIC' ? 'Tamu Publik' : getFriendlyRoleName(activeRole)}</span>
+              </div>
               <button 
                 onClick={handleLogout}
                 className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
