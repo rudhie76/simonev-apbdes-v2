@@ -3,13 +3,19 @@
   "name": "SIMONEV APBDes Waru - Penajam Paser Utara",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "./favicon.png",
+      "type": "image/png",
+      "sizes": "32x32 48x48",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "/logo.png",
+      "src": "./logo.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
