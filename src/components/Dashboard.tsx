@@ -56,6 +56,7 @@ interface DashboardProps {
   onUpdateSiskeudesPagu?: (village: Village, paguTotal: number, breakdown?: any) => Promise<void>;
   bumdesList?: BumdesMonev[];
   onNavigateToBumdes?: () => void;
+  activeRole?: string;
 }
 
 export default function Dashboard({ 
@@ -67,14 +68,26 @@ export default function Dashboard({
   siskeudesPaguList = [],
   onUpdateSiskeudesPagu,
   bumdesList = [],
-  onNavigateToBumdes
+  onNavigateToBumdes,
+  activeRole
 }: DashboardProps) {
-  const [selectedVillage, setSelectedVillage] = useState<Village | 'ALL'>('ALL');
+  const userVillage = useMemo((): Village | 'ALL' => {
+    if (activeRole === 'OP_BANGUN_MULYA') return 'Bangun Mulya';
+    if (activeRole === 'OP_SESULU') return 'Sesulu';
+    if (activeRole === 'OP_API_API') return 'Api-api';
+    return 'ALL';
+  }, [activeRole]);
+
+  const [selectedVillage, setSelectedVillage] = useState<Village | 'ALL'>(userVillage);
   const [selectedSector, setSelectedSector] = useState<Sector | 'ALL'>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<ActivityStatus | 'ALL'>('ALL');
   const [selectedSourceOfFunds, setSelectedSourceOfFunds] = useState<SourceOfFunds | 'ALL'>('ALL');
   const [selectedPhysical, setSelectedPhysical] = useState<'ALL' | '100' | 'UNDER_100'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    setSelectedVillage(userVillage);
+  }, [userVillage]);
 
   // 1. Filtered activities for current display or metric views
   const filteredActivities = useMemo(() => {
@@ -321,34 +334,41 @@ export default function Dashboard({
       </div>
 
       {/* Village Quick Switcher Bar */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100 rounded-xl max-w-fit border border-slate-200">
-        <button
-          onClick={() => setSelectedVillage('ALL')}
-          className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-            selectedVillage === 'ALL'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-          }`}
-        >
-          Semua Wilayah ({activities.length})
-        </button>
-        {(['Bangun Mulya', 'Sesulu', 'Api-api'] as Village[]).map((v) => {
-          const count = activities.filter(a => a.village === v).length;
-          return (
-            <button
-              key={v}
-              onClick={() => setSelectedVillage(v)}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-                selectedVillage === v
-                  ? 'bg-blue-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              Desa {v} ({count})
-            </button>
-          );
-        })}
-      </div>
+      {userVillage === 'ALL' ? (
+        <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-100 rounded-xl max-w-fit border border-slate-200">
+          <button
+            onClick={() => setSelectedVillage('ALL')}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+              selectedVillage === 'ALL'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            Semua Wilayah ({activities.length})
+          </button>
+          {(['Bangun Mulya', 'Sesulu', 'Api-api'] as Village[]).map((v) => {
+            const count = activities.filter(a => a.village === v).length;
+            return (
+              <button
+                key={v}
+                onClick={() => setSelectedVillage(v)}
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+                  selectedVillage === v
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                }`}
+              >
+                Desa {v} ({count})
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl max-w-fit text-blue-900 text-xs font-extrabold shadow-2xs">
+          <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+          <span>Wilayah Dasbor Operator: <strong className="text-blue-700">Desa {userVillage}</strong> ({activities.filter(a => a.village === userVillage).length} kegiatan)</span>
+        </div>
+      )}
 
       {/* Main KPI Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">

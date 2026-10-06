@@ -1405,6 +1405,7 @@ export default function App() {
                 onUpdateSiskeudesPagu={handleUpdateSiskeudesPagu}
                 bumdesList={bumdesMonevList}
                 onNavigateToBumdes={() => setActiveTab('MONEV_BUMDES')}
+                activeRole={activeRole}
               />
             )}
 
