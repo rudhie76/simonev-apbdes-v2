@@ -386,43 +386,43 @@ export default function Dashboard({
       )}
 
       {/* Main KPI Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
         {/* KPI 1: Total APBDes Allocation */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between min-h-[160px]">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[165px]">
           <div>
             <div className="flex items-center justify-between pb-3">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pagu Total APBDes</span>
-              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                <Building2 className="w-5 h-5" />
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Pagu Total APBDes</span>
+              <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                <Building2 className="w-4 h-4" />
               </div>
             </div>
             <div className="space-y-1">
-              <div className="text-xl md:text-2xl font-bold text-slate-900 font-mono tracking-tight flex items-baseline gap-1 flex-wrap">
+              <div className="text-xl md:text-2xl font-extrabold text-slate-900 font-mono tracking-tight flex items-baseline gap-1 flex-wrap">
                 {formatRupiah(stats.totalBudgets)}
               </div>
-              <p className="text-xs text-slate-550 font-medium flex items-center gap-1 flex-wrap">
-                <span>{selectedVillage === 'ALL' ? 'Total 3 Desa Kecamatan Waru' : `Pagu Anggaran Desa ${selectedVillage}`}</span>
-                {selectedVillage !== 'ALL' && siskeudesPaguList.find(p => p.village === selectedVillage)?.isSynced && (
-                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 bg-emerald-150 text-emerald-800 text-[8px] rounded font-bold uppercase tracking-wider font-mono border border-emerald-250">Sync</span>
+              <p className="text-[11px] text-slate-500 font-medium flex items-center gap-1 flex-wrap">
+                <span>{effectiveVillage === 'ALL' ? 'Total 3 Desa Waru' : `Pagu Desa ${effectiveVillage}`}</span>
+                {effectiveVillage !== 'ALL' && siskeudesPaguList.find(p => p.village === effectiveVillage)?.isSynced && (
+                  <span className="inline-flex items-center px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[8px] rounded font-bold uppercase tracking-wider font-mono border border-emerald-250">Sync</span>
                 )}
               </p>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 space-y-1">
+          <div className="mt-3 pt-3 border-t border-slate-100 space-y-1">
             <div className="flex items-center justify-between text-[10px] text-slate-500">
               <span className="font-semibold">Rencana Simonev:</span>
               <span className="font-bold text-slate-700 font-mono">
-                {formatRupiah(selectedVillage === 'ALL' 
+                {formatRupiah(effectiveVillage === 'ALL' 
                   ? Object.values(activitiesAllocatedBudgets).reduce((a, b) => a + b, 0)
-                  : (activitiesAllocatedBudgets[selectedVillage] || 0)
+                  : (activitiesAllocatedBudgets[effectiveVillage] || 0)
                 )}
               </span>
             </div>
             {(() => {
-              const plannedSum = selectedVillage === 'ALL' 
+              const plannedSum = effectiveVillage === 'ALL' 
                 ? Object.values(activitiesAllocatedBudgets).reduce((a, b) => a + b, 0)
-                : (activitiesAllocatedBudgets[selectedVillage] || 0);
+                : (activitiesAllocatedBudgets[effectiveVillage] || 0);
               const planPercent = stats.totalBudgets > 0 ? Math.round((plannedSum / stats.totalBudgets) * 100) : 0;
               return (
                 <div className="space-y-1">
@@ -430,7 +430,7 @@ export default function Dashboard({
                     <span>Rasio Terencana:</span>
                     <span>{planPercent}%</span>
                   </div>
-                  <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-blue-600 h-full rounded-full transition-all duration-300" style={{ width: `${Math.min(planPercent, 100)}%` }} />
                   </div>
                 </div>
@@ -439,97 +439,140 @@ export default function Dashboard({
           </div>
         </div>
 
-        {/* KPI 2: Budget Allocated & Spending Absorption */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-center justify-between pb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Realisasi Anggaran</span>
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-xl md:text-2xl font-bold text-slate-900 font-mono tracking-tight">
-              {formatRupiah(stats.totalBudgetRealized)}
+        {/* KPI 2: Budget Realized */}
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[165px]">
+          <div>
+            <div className="flex items-center justify-between pb-3">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Realisasi Belanja</span>
+              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                <TrendingUp className="w-4 h-4" />
+              </div>
             </div>
             <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <span className="font-semibold">Penyerapan APBDes:</span>
-                <span className="font-bold text-emerald-600 font-mono">{stats.totalBudgetAbsorptionRate}%</span>
+              <div className="text-xl md:text-2xl font-extrabold text-slate-900 font-mono tracking-tight">
+                {formatRupiah(stats.totalBudgetRealized)}
               </div>
-              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                <div 
-                  className="bg-emerald-500 h-full rounded-full transition-all duration-500" 
-                  style={{ width: `${Math.min(stats.totalBudgetAbsorptionRate, 100)}%` }}
-                ></div>
-              </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Pencairan SPJ Realtime
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-100 space-y-1">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-semibold text-[10px]">Penyerapan APBDes:</span>
+              <span className="font-bold text-emerald-600 font-mono text-[11px]">{stats.totalBudgetAbsorptionRate}%</span>
+            </div>
+            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+              <div 
+                className="bg-emerald-500 h-full rounded-full transition-all duration-500" 
+                style={{ width: `${Math.min(stats.totalBudgetAbsorptionRate, 100)}%` }}
+              ></div>
             </div>
           </div>
         </div>
 
         {/* KPI 3: Physical Performance */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-center justify-between pb-3">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Rata-rata Progres Fisik</span>
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
-              <ActivityIcon className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-xl md:text-2xl font-bold text-slate-900 font-mono tracking-tight">
-              {stats.avgPhysicalProgress}%
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[165px]">
+          <div>
+            <div className="flex items-center justify-between pb-3">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Progres Fisik</span>
+              <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
+                <ActivityIcon className="w-4 h-4" />
+              </div>
             </div>
             <div className="space-y-1">
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <span className="font-semibold">Realisasi Fisik:</span>
-                <span className="font-bold text-amber-500 font-mono">{stats.avgPhysicalProgress}%</span>
+              <div className="text-xl md:text-2xl font-extrabold text-slate-900 font-mono tracking-tight">
+                {stats.avgPhysicalProgress}%
               </div>
-              <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                <div 
-                  className="bg-amber-500 h-full rounded-full transition-all duration-500" 
-                  style={{ width: `${stats.avgPhysicalProgress}%` }}
-                ></div>
-              </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Rata-rata Fisik Lapangan
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-100 space-y-1">
+            <div className="flex items-center justify-between text-xs text-slate-500">
+              <span className="font-semibold text-[10px]">Capaian Fisik:</span>
+              <span className="font-bold text-amber-600 font-mono text-[11px]">{stats.avgPhysicalProgress}%</span>
+            </div>
+            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+              <div 
+                className="bg-amber-500 h-full rounded-full transition-all duration-500" 
+                style={{ width: `${stats.avgPhysicalProgress}%` }}
+              ></div>
             </div>
           </div>
         </div>
 
         {/* KPI 4: Menunggu Evaluasi */}
-        <div className="bg-[#fff9f2] p-5 rounded-2xl border border-orange-200/60 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[160px]">
+        <div className="bg-white p-5 rounded-2xl border border-orange-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[165px]">
           <div>
-            <span className="text-xs font-extrabold text-[#c2410c] uppercase tracking-wider">MENUNGGU EVALUASI</span>
+            <div className="flex items-center justify-between pb-3">
+              <span className="text-[11px] font-bold text-orange-700 uppercase tracking-wider">Menunggu Evaluasi</span>
+              <div className="p-2 bg-orange-100 text-orange-600 rounded-xl">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-3xl md:text-4xl font-extrabold text-orange-900 font-mono tracking-tight">
+                {stats.waitingEvaluasi}
+              </div>
+              <p className="text-[11px] text-orange-600 font-medium leading-tight">
+                Kegiatan Fisik 100%
+              </p>
+            </div>
           </div>
-          <div className="text-5xl font-sans font-extrabold text-[#9a3412] tracking-tight mt-3">
-            {stats.waitingEvaluasi}
+          <div className="mt-3 pt-2 border-t border-orange-100 flex items-center justify-between text-[10px] text-orange-700 font-semibold">
+            <span>Perlu Verifikasi Kec.</span>
+            <span className="px-1.5 py-0.5 bg-orange-100 rounded text-orange-800 font-mono font-bold">{stats.waitingEvaluasi} usulan</span>
           </div>
-          <p className="text-[11px] text-[#ea580c] font-medium leading-relaxed mt-2">
-            Kegiatan fisik 100% yang diajukan untuk dievaluasi oleh kecamatan.
-          </p>
         </div>
 
-        {/* KPI: Dalam Proses */}
-        <div className="bg-[#eff6ff]/70 p-5 rounded-2xl border border-blue-250/50 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[160px]">
+        {/* KPI 5: Dalam Proses */}
+        <div className="bg-white p-5 rounded-2xl border border-blue-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[165px]">
           <div>
-            <span className="text-xs font-extrabold text-[#1d4ed8] uppercase tracking-wider">DALAM PROSES</span>
+            <div className="flex items-center justify-between pb-3">
+              <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider">Dalam Proses</span>
+              <div className="p-2 bg-blue-100 text-blue-600 rounded-xl">
+                <RefreshCw className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-3xl md:text-4xl font-extrabold text-blue-900 font-mono tracking-tight">
+                {stats.inProgress}
+              </div>
+              <p className="text-[11px] text-blue-600 font-medium leading-tight">
+                Pekerjaan Fisik Berjalan
+              </p>
+            </div>
           </div>
-          <div className="text-5xl font-sans font-extrabold text-[#1e3a8a] tracking-tight mt-3">
-            {stats.inProgress}
+          <div className="mt-3 pt-2 border-t border-blue-100 flex items-center justify-between text-[10px] text-blue-700 font-semibold">
+            <span>Pelaksanaan Desa</span>
+            <span className="px-1.5 py-0.5 bg-blue-100 rounded text-blue-800 font-mono font-bold">{stats.inProgress} usulan</span>
           </div>
-          <p className="text-[11px] text-[#2563eb] font-medium leading-relaxed mt-2">
-            Kegiatan sedang dalam proses pengerjaan fisik desa.
-          </p>
         </div>
 
-        {/* KPI 5: Telah Disetujui (ACC) */}
-        <div className="bg-[#f0fdf4]/70 p-5 rounded-2xl border border-emerald-200/50 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[160px]">
+        {/* KPI 6: Disetujui (ACC) */}
+        <div className="bg-white p-5 rounded-2xl border border-emerald-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[165px]">
           <div>
-            <span className="text-xs font-extrabold text-[#15803d] uppercase tracking-wider">TELAH DISETUJUI (ACC)</span>
+            <div className="flex items-center justify-between pb-3">
+              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Disetujui (ACC)</span>
+              <div className="p-2 bg-emerald-100 text-emerald-600 rounded-xl">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-3xl md:text-4xl font-extrabold text-emerald-900 font-mono tracking-tight">
+                {stats.approved}
+              </div>
+              <p className="text-[11px] text-emerald-600 font-medium leading-tight">
+                Pengesahan Kecamatan
+              </p>
+            </div>
           </div>
-          <div className="text-5xl font-sans font-extrabold text-[#064e3b] tracking-tight mt-3">
-            {stats.approved}
+          <div className="mt-3 pt-2 border-t border-emerald-100 flex items-center justify-between text-[10px] text-emerald-700 font-semibold">
+            <span>Ttd Digital Valid</span>
+            <span className="px-1.5 py-0.5 bg-emerald-100 rounded text-emerald-800 font-mono font-bold">{stats.approved} usulan</span>
           </div>
-          <p className="text-[11px] text-[#16a34a] font-medium leading-relaxed mt-2">
-            Laporan akhir disematkan tanda tangan digital.
-          </p>
         </div>
       </div>
 
