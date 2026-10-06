@@ -103,7 +103,9 @@ function cleanForFirestore(data: any): any {
 
 const INITIAL_SISKEUDES_PAGU: SiskeudesPagu[] = [
   {
+    id: 'Bangun Mulya_2026',
     village: 'Bangun Mulya',
+    year: 2026,
     paguTotal: 1300000000,
     lastSynced: '2026-06-15T01:00:00Z',
     isSynced: false,
@@ -115,7 +117,9 @@ const INITIAL_SISKEUDES_PAGU: SiskeudesPagu[] = [
     }
   },
   {
+    id: 'Sesulu_2026',
     village: 'Sesulu',
+    year: 2026,
     paguTotal: 1520000000,
     lastSynced: '2026-06-15T01:00:00Z',
     isSynced: false,
@@ -128,7 +132,9 @@ const INITIAL_SISKEUDES_PAGU: SiskeudesPagu[] = [
     }
   },
   {
+    id: 'Api-api_2026',
     village: 'Api-api',
+    year: 2026,
     paguTotal: 1180000000,
     lastSynced: '2026-06-15T01:00:00Z',
     isSynced: false,
@@ -870,15 +876,22 @@ export default function App() {
   // Siskeudes village budgets represents the overarching budget ceiling
   const villageBudgets = useMemo(() => {
     const budgets: Record<string, number> = {
-      'Bangun Mulya': 1250000000,
-      'Sesulu': 1480000000,
-      'Api-api': 1150000000
+      'Bangun Mulya': 0,
+      'Sesulu': 0,
+      'Api-api': 0
     };
-    siskeudesPagu.forEach(item => {
-      budgets[item.village] = item.paguTotal;
-    });
+    const currentYearPagus = siskeudesPagu.filter(p => (p.year || 2026) === selectedYear);
+    if (currentYearPagus.length > 0) {
+      currentYearPagus.forEach(item => {
+        budgets[item.village] = item.paguTotal;
+      });
+    } else if (selectedYear === 2026) {
+      budgets['Bangun Mulya'] = 1300000000;
+      budgets['Sesulu'] = 1520000000;
+      budgets['Api-api'] = 1180000000;
+    }
     return budgets;
-  }, [siskeudesPagu]);
+  }, [siskeudesPagu, selectedYear]);
 
   // Dynamic village budgets calculated directly from activities entered by operators
   const activitiesAllocatedBudgets = useMemo(() => {
@@ -897,10 +910,13 @@ export default function App() {
     return budgets;
   }, [filteredActivitiesByYear]);
 
-  // Update village APBDes pagu from manual form input
-  const handleUpdateSiskeudesPagu = async (village: Village, paguTotal: number, breakdown?: any) => {
+  // Update village APBDes pagu from manual form input per year
+  const handleUpdateSiskeudesPagu = async (village: Village, paguTotal: number, breakdown?: any, yearToUpdate: number = selectedYear) => {
+    const docId = `${village}_${yearToUpdate}`;
     const item: SiskeudesPagu = {
+      id: docId,
       village,
+      year: yearToUpdate,
       paguTotal,
       lastSynced: new Date().toISOString(),
       isSynced: true,
@@ -915,7 +931,7 @@ export default function App() {
     const newLog: NotificationLog = {
       id: logId,
       title: 'Update Pagu Anggaran',
-      description: `Mengubah Pagu APBDes Desa ${village} secara manual sebesar ${formatRupiah(paguTotal)}.`,
+      description: `Mengubah Pagu APBDes Desa ${village} TA ${yearToUpdate} secara manual sebesar ${formatRupiah(paguTotal)}.`,
       timestamp: new Date().toISOString(),
       type: 'success',
       village
@@ -923,10 +939,8 @@ export default function App() {
 
     // 1. Instantly update local React states and LocalStorage
     setSiskeudesPagu(prev => {
-      const updated = prev.map(p => p.village === village ? item : p);
-      if (!updated.some(p => p.village === village)) {
-        updated.push(item);
-      }
+      const filtered = prev.filter(p => !(p.village === village && (p.year || 2026) === yearToUpdate));
+      const updated = [...filtered, item];
       safeSaveToLocalStorage('simonev_siskeudes_pagu', updated);
       return updated;
     });
@@ -938,7 +952,7 @@ export default function App() {
 
     // 2. Perform background synchronization with Cloud Firestore
     try {
-      await setDoc(doc(db, 'siskeudes_pagu', village), item);
+      await setDoc(doc(db, 'siskeudes_pagu', docId), item);
       await setDoc(doc(db, 'logs', logId), cleanForFirestore(newLog));
     } catch (error) {
       console.warn("Firestore update pagu error caught (Quota exceeded):", error);
@@ -1484,6 +1498,7 @@ export default function App() {
                   paguList={siskeudesPagu}
                   onUpdatePagu={handleUpdateSiskeudesPagu}
                   activeRole={activeRole}
+                  selectedYear={selectedYear}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-6">

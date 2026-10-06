@@ -82,7 +82,9 @@ export interface NotificationLog {
 }
 
 export interface SiskeudesPagu {
+  id?: string;
   village: Village;
+  year?: number;
   paguTotal: number;
   lastSynced: string;
   isSynced: boolean;

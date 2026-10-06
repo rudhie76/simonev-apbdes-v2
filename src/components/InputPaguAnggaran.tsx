@@ -18,14 +18,16 @@ import {
 
 interface InputPaguAnggaranProps {
   paguList: SiskeudesPagu[];
-  onUpdatePagu: (village: Village, paguTotal: number, breakdown: { dd: number; add: number; pad: number; pbh: number; bankeu: number; silpa: number }) => Promise<void>;
+  onUpdatePagu: (village: Village, paguTotal: number, breakdown: { dd: number; add: number; pad: number; pbh: number; bankeu: number; silpa: number }, year?: number) => Promise<void>;
   activeRole: string;
+  selectedYear?: number;
 }
 
 export default function InputPaguAnggaran({
   paguList,
   onUpdatePagu,
-  activeRole
+  activeRole,
+  selectedYear = 2026
 }: InputPaguAnggaranProps) {
   // Determine if user has restricted access
   const isOperatorDesa = activeRole !== 'OP_KECAMATAN';
@@ -52,9 +54,9 @@ export default function InputPaguAnggaran({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Sync state whenever targetVillage changes, pre-filling with current Firestore values
+  // Sync state whenever targetVillage or selectedYear changes, pre-filling with current Firestore values
   useEffect(() => {
-    const currentPagu = paguList.find(p => p.village === targetVillage);
+    const currentPagu = paguList.find(p => p.village === targetVillage && (p.year || 2026) === selectedYear);
     if (currentPagu && currentPagu.fundsBreakdown) {
       setDd(currentPagu.fundsBreakdown.dd || 0);
       setAdd(currentPagu.fundsBreakdown.add || 0);
@@ -73,12 +75,12 @@ export default function InputPaguAnggaran({
     }
     setSaveSuccess(false);
     setIsDirty(false);
-  }, [targetVillage]);
+  }, [targetVillage, selectedYear]);
 
   // If paguList updates from server and user has not made local unsaved edits, sync baseline once
   useEffect(() => {
     if (!isDirty) {
-      const currentPagu = paguList.find(p => p.village === targetVillage);
+      const currentPagu = paguList.find(p => p.village === targetVillage && (p.year || 2026) === selectedYear);
       if (currentPagu && currentPagu.fundsBreakdown) {
         setDd(currentPagu.fundsBreakdown.dd || 0);
         setAdd(currentPagu.fundsBreakdown.add || 0);
@@ -88,7 +90,7 @@ export default function InputPaguAnggaran({
         setSilpa(currentPagu.fundsBreakdown.silpa || 0);
       }
     }
-  }, [paguList]);
+  }, [paguList, selectedYear]);
 
   // Adjust target village if activeRole changes
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function InputPaguAnggaran({
         bankeu,
         pad,
         silpa
-      });
+      }, selectedYear);
       setSaveSuccess(true);
       setIsDirty(false);
     } catch (err) {
@@ -157,7 +159,7 @@ export default function InputPaguAnggaran({
       {/* Target Status Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {(['Bangun Mulya', 'Sesulu', 'Api-api'] as Village[]).map((v) => {
-          const paguObj = paguList.find(p => p.village === v);
+          const paguObj = paguList.find(p => p.village === v && (p.year || 2026) === selectedYear);
           const isSelected = targetVillage === v;
           const isRestrictedForUser = isOperatorDesa && getDefaultVillage() !== v;
 
