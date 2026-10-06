@@ -48,6 +48,7 @@ export default function InputPaguAnggaran({
   const [pad, setPad] = useState<number>(0);
   const [silpa, setSilpa] = useState<number>(0);
 
+  const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -71,7 +72,23 @@ export default function InputPaguAnggaran({
       setSilpa(0);
     }
     setSaveSuccess(false);
-  }, [targetVillage, paguList]);
+    setIsDirty(false);
+  }, [targetVillage]);
+
+  // If paguList updates from server and user has not made local unsaved edits, sync baseline once
+  useEffect(() => {
+    if (!isDirty) {
+      const currentPagu = paguList.find(p => p.village === targetVillage);
+      if (currentPagu && currentPagu.fundsBreakdown) {
+        setDd(currentPagu.fundsBreakdown.dd || 0);
+        setAdd(currentPagu.fundsBreakdown.add || 0);
+        setPbh(currentPagu.fundsBreakdown.pbh || 0);
+        setBankeu(currentPagu.fundsBreakdown.bankeu || 0);
+        setPad(currentPagu.fundsBreakdown.pad || 0);
+        setSilpa(currentPagu.fundsBreakdown.silpa || 0);
+      }
+    }
+  }, [paguList]);
 
   // Adjust target village if activeRole changes
   useEffect(() => {
@@ -104,6 +121,7 @@ export default function InputPaguAnggaran({
         silpa
       });
       setSaveSuccess(true);
+      setIsDirty(false);
     } catch (err) {
       console.error(err);
     } finally {
@@ -246,7 +264,10 @@ export default function InputPaguAnggaran({
                   type="number"
                   min="0"
                   value={dd || ''}
-                  onChange={(e) => setDd(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => {
+                    setDd(Math.max(0, parseInt(e.target.value) || 0));
+                    setIsDirty(true);
+                  }}
                   placeholder="0"
                   className="w-full pl-10 pr-4 py-2 text-sm font-semibold rounded-xl border border-slate-250 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-hidden tracking-wide font-mono"
                 />
@@ -268,7 +289,10 @@ export default function InputPaguAnggaran({
                   type="number"
                   min="0"
                   value={add || ''}
-                  onChange={(e) => setAdd(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => {
+                    setAdd(Math.max(0, parseInt(e.target.value) || 0));
+                    setIsDirty(true);
+                  }}
                   placeholder="0"
                   className="w-full pl-10 pr-4 py-2 text-sm font-semibold rounded-xl border border-slate-250 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-hidden tracking-wide font-mono"
                 />
@@ -290,7 +314,10 @@ export default function InputPaguAnggaran({
                   type="number"
                   min="0"
                   value={pbh || ''}
-                  onChange={(e) => setPbh(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => {
+                    setPbh(Math.max(0, parseInt(e.target.value) || 0));
+                    setIsDirty(true);
+                  }}
                   placeholder="0"
                   className="w-full pl-10 pr-4 py-2 text-sm font-semibold rounded-xl border border-slate-250 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-hidden tracking-wide font-mono"
                 />
@@ -312,7 +339,10 @@ export default function InputPaguAnggaran({
                   type="number"
                   min="0"
                   value={bankeu || ''}
-                  onChange={(e) => setBankeu(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => {
+                    setBankeu(Math.max(0, parseInt(e.target.value) || 0));
+                    setIsDirty(true);
+                  }}
                   placeholder="0"
                   className="w-full pl-10 pr-4 py-2 text-sm font-semibold rounded-xl border border-slate-250 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-hidden tracking-wide font-mono"
                 />
@@ -334,7 +364,10 @@ export default function InputPaguAnggaran({
                   type="number"
                   min="0"
                   value={pad || ''}
-                  onChange={(e) => setPad(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => {
+                    setPad(Math.max(0, parseInt(e.target.value) || 0));
+                    setIsDirty(true);
+                  }}
                   placeholder="0"
                   className="w-full pl-10 pr-4 py-2 text-sm font-semibold rounded-xl border border-slate-250 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-hidden tracking-wide font-mono"
                 />
@@ -356,7 +389,10 @@ export default function InputPaguAnggaran({
                   type="number"
                   min="0"
                   value={silpa || ''}
-                  onChange={(e) => setSilpa(Math.max(0, parseInt(e.target.value) || 0))}
+                  onChange={(e) => {
+                    setSilpa(Math.max(0, parseInt(e.target.value) || 0));
+                    setIsDirty(true);
+                  }}
                   placeholder="0"
                   className="w-full pl-10 pr-4 py-2 text-sm font-semibold rounded-xl border border-slate-250 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-hidden tracking-wide font-mono"
                 />
