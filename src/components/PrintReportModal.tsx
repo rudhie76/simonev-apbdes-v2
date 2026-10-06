@@ -24,6 +24,9 @@ export default function PrintReportModal({
   const [selectedSector, setSelectedSector] = useState<Sector | 'ALL'>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<ActivityStatus | 'ALL' | 'FISIK_100_BELUM_ACC'>('ALL');
   const [selectedSource, setSelectedSource] = useState<SourceOfFunds | 'ALL'>('ALL');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
+  const [printDate, setPrintDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
 
   const absoluteLogoUrl = LOGO_BASE64;
 
@@ -72,7 +75,7 @@ export default function PrintReportModal({
     }
   }, [isOpen, initialVillage]);
 
-  // 1. Filtered data for report
+  // 1. Filtered data for report including Date Range
   const reportActivities = useMemo(() => {
     return activities.filter((act) => {
       const matchVillage = selectedVillage === 'ALL' || act.village === selectedVillage;
@@ -85,9 +88,25 @@ export default function PrintReportModal({
             ? (act.isKecamatanApproved === true)
             : act.status === selectedStatus;
       const matchSource = selectedSource === 'ALL' || (act.sourceOfFunds || 'Dana Desa (DD)') === selectedSource;
-      return matchVillage && matchSector && matchStatus && matchSource;
+
+      // Filter Range Tanggal
+      let matchDate = true;
+      const rawDate = act.lastUpdated || act.createdAt;
+      if (rawDate) {
+        const actTime = new Date(rawDate).getTime();
+        if (startDate) {
+          const startTime = new Date(`${startDate}T00:00:00`).getTime();
+          if (actTime < startTime) matchDate = false;
+        }
+        if (endDate) {
+          const endTime = new Date(`${endDate}T23:59:59`).getTime();
+          if (actTime > endTime) matchDate = false;
+        }
+      }
+
+      return matchVillage && matchSector && matchStatus && matchSource && matchDate;
     });
-  }, [activities, selectedVillage, selectedSector, selectedStatus, selectedSource]);
+  }, [activities, selectedVillage, selectedSector, selectedStatus, selectedSource, startDate, endDate]);
 
   // 2. Calculations based on filtered data
   const summary = useMemo(() => {
@@ -110,15 +129,48 @@ export default function PrintReportModal({
     };
   }, [reportActivities]);
 
-  // Current Indonesian Date formatted beautifully
+  // Indonesian Date formatted for print date & period
   const formattedDateIndo = useMemo(() => {
     const months = [
       'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
       'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     ];
+    if (printDate) {
+      const parts = printDate.split('-');
+      if (parts.length === 3) {
+        const year = parts[0];
+        const monthIdx = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        if (monthIdx >= 0 && monthIdx < 12) {
+          return `${day} ${months[monthIdx]} ${year}`;
+        }
+      }
+    }
     const d = new Date();
     return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-  }, []);
+  }, [printDate]);
+
+  const formattedPeriodIndo = useMemo(() => {
+    const formatIndoDate = (dateStr: string) => {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        return `${parseInt(parts[2], 10)} ${months[mIdx]} ${parts[0]}`;
+      }
+      return dateStr;
+    };
+
+    if (startDate && endDate) {
+      return `${formatIndoDate(startDate)} s/d ${formatIndoDate(endDate)}`;
+    } else if (startDate) {
+      return `Dari ${formatIndoDate(startDate)}`;
+    } else if (endDate) {
+      return `s/d ${formatIndoDate(endDate)}`;
+    }
+    return 'Seluruh Periode Tanggal';
+  }, [startDate, endDate]);
 
   // Find the evaluator name from the selected/filtered activities or history
   const activeEvaluatorName = useMemo(() => {
@@ -220,81 +272,137 @@ export default function PrintReportModal({
         </div>
 
         {/* Configurations & Quick Filter Controls (Hidden during print) */}
-        <div className="bg-slate-50 p-4 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0 print:hidden">
-          {/* Desa Filter */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-              <Building2 className="w-3 h-3 text-slate-400" /> Wilayah Administrasi Desa
-            </label>
-            <select
-              value={selectedVillage}
-              onChange={(e) => setSelectedVillage(e.target.value as any)}
-              disabled={initialVillage !== 'ALL'}
-              className="w-full text-xs font-semibold bg-white disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed border border-slate-300 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {initialVillage === 'ALL' && <option value="ALL">Semua Desa (Bangun Mulya, Sesulu, Api-api)</option>}
-              <option value="Bangun Mulya">Desa Bangun Mulya</option>
-              <option value="Sesulu">Desa Sesulu</option>
-              <option value="Api-api">Desa Api-api</option>
-            </select>
+        <div className="bg-slate-50 p-4 border-b border-slate-200 space-y-3 shrink-0 print:hidden">
+          {/* Row 1: Primary Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Desa Filter */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                <Building2 className="w-3 h-3 text-slate-400" /> Wilayah Administrasi Desa
+              </label>
+              <select
+                value={selectedVillage}
+                onChange={(e) => setSelectedVillage(e.target.value as any)}
+                disabled={initialVillage !== 'ALL'}
+                className="w-full text-xs font-semibold bg-white disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed border border-slate-300 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {initialVillage === 'ALL' && <option value="ALL">Semua Desa (Bangun Mulya, Sesulu, Api-api)</option>}
+                <option value="Bangun Mulya">Desa Bangun Mulya</option>
+                <option value="Sesulu">Desa Sesulu</option>
+                <option value="Api-api">Desa Api-api</option>
+              </select>
+            </div>
+
+            {/* Bidang/Sector Filter */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                <Filter className="w-3 h-3 text-slate-400" /> Bidang Prioritas APBDes
+              </label>
+              <select
+                value={selectedSector}
+                onChange={(e) => setSelectedSector(e.target.value as any)}
+                className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 truncate"
+              >
+                <option value="ALL">Semua Bidang Anggaran</option>
+                <option value="Penyelenggaraan Pemerintahan">Penyelenggaraan Pemerintahan</option>
+                <option value="Pembangunan Desa (Infrastruktur)">Pembangunan Desa (Infrastruktur)</option>
+                <option value="Pembangunan Desa (Non Infrastruktur)">Pembangunan Desa (Non Infrastruktur)</option>
+                <option value="Pembinaan Kemasyarakatan">Pembinaan Kemasyarakatan</option>
+                <option value="Pemberdayaan Masyarakat">Pemberdayaan Masyarakat</option>
+                <option value="Penanggulangan Bencana & Mendesak">Kebencanaan & Mendesak</option>
+              </select>
+            </div>
+
+            {/* Status Filter */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                <CheckSquare className="w-3 h-3 text-slate-400" /> Status Realisasi Fisik
+              </label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value as any)}
+                className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="ALL">Semua Status Fisik</option>
+                <option value="BELUM_MULAI">Belum Mulai</option>
+                <option value="DALAM_PROSES">Dalam Proses</option>
+                <option value="SELESAI">Selesai (Sudah TTD / ACC PMD)</option>
+                <option value="FISIK_100_BELUM_ACC">Fisik 100% Belum ACC/TTD</option>
+              </select>
+            </div>
+
+            {/* Sumber Dana Filter */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                <Coins className="w-3 h-3 text-slate-400" /> Sumber Dana APBDes
+              </label>
+              <select
+                value={selectedSource}
+                onChange={(e) => setSelectedSource(e.target.value as any)}
+                className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="ALL">Semua Sumber Dana</option>
+                <option value="Dana Desa (DD)">Dana Desa (DD)</option>
+                <option value="Alokasi Dana Desa (ADD)">Alokasi Dana Desa (ADD)</option>
+                <option value="Pendapatan Bagi Hasil (PBH)">Pendapatan Bagi Hasil (PBH)</option>
+                <option value="Bantuan Keuangan (Bankeu)">Bantuan Keuangan (Bankeu)</option>
+                <option value="Pendapatan Asli Desa (PAD)">Pendapatan Asli Desa (PAD)</option>
+                <option value="Sisa Lebih Perhitungan Anggaran (SiLPA)">Sisa Lebih Perhitungan Anggaran (SiLPA)</option>
+              </select>
+            </div>
           </div>
 
-          {/* Bidang/Sector Filter */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-              <Filter className="w-3 h-3 text-slate-400" /> Bidang Prioritas APBDes
-            </label>
-            <select
-              value={selectedSector}
-              onChange={(e) => setSelectedSector(e.target.value as any)}
-              className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 truncate"
-            >
-              <option value="ALL">Semua Bidang Anggaran</option>
-              <option value="Penyelenggaraan Pemerintahan">Penyelenggaraan Pemerintahan</option>
-              <option value="Pembangunan Desa (Infrastruktur)">Pembangunan Desa (Infrastruktur)</option>
-              <option value="Pembangunan Desa (Non Infrastruktur)">Pembangunan Desa (Non Infrastruktur)</option>
-              <option value="Pembinaan Kemasyarakatan">Pembinaan Kemasyarakatan</option>
-              <option value="Pemberdayaan Masyarakat">Pemberdayaan Masyarakat</option>
-              <option value="Penanggulangan Bencana & Mendesak">Kebencanaan & Mendesak</option>
-            </select>
-          </div>
+          {/* Row 2: Rentang Tanggal Filter & Tanggal Cetak */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2.5 border-t border-slate-200">
+            {/* Tanggal Awal */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-blue-700 uppercase tracking-wider flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-blue-600" /> Periode Tanggal Awal
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+              />
+            </div>
 
-          {/* Status Filter */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-              <CheckSquare className="w-3 h-3 text-slate-400" /> Status Realisasi Fisik
-            </label>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value as any)}
-              className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="ALL">Semua Status Fisik</option>
-              <option value="BELUM_MULAI">Belum Mulai</option>
-              <option value="DALAM_PROSES">Dalam Proses</option>
-              <option value="SELESAI">Selesai (Sudah TTD / ACC PMD)</option>
-              <option value="FISIK_100_BELUM_ACC">Fisik 100% Belum ACC/TTD</option>
-            </select>
-          </div>
+            {/* Tanggal Akhir */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-blue-700 uppercase tracking-wider flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-blue-600" /> Periode Tanggal Akhir
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+              />
+            </div>
 
-          {/* Sumber Dana Filter */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-              <Coins className="w-3 h-3 text-slate-400" /> Sumber Dana APBDes
-            </label>
-            <select
-              value={selectedSource}
-              onChange={(e) => setSelectedSource(e.target.value as any)}
-              className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="ALL">Semua Sumber Dana</option>
-              <option value="Dana Desa (DD)">Dana Desa (DD)</option>
-              <option value="Alokasi Dana Desa (ADD)">Alokasi Dana Desa (ADD)</option>
-              <option value="Pendapatan Bagi Hasil (PBH)">Pendapatan Bagi Hasil (PBH)</option>
-              <option value="Bantuan Keuangan (Bankeu)">Bantuan Keuangan (Bankeu)</option>
-              <option value="Pendapatan Asli Desa (PAD)">Pendapatan Asli Desa (PAD)</option>
-              <option value="Sisa Lebih Perhitungan Anggaran (SiLPA)">Sisa Lebih Perhitungan Anggaran (SiLPA)</option>
-            </select>
+            {/* Custom Tanggal Cetak Surat */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider flex items-center gap-1">
+                  <Printer className="w-3.5 h-3.5 text-emerald-600" /> Tanggal Cetak Surat
+                </label>
+                {(startDate || endDate) && (
+                  <button
+                    type="button"
+                    onClick={() => { setStartDate(''); setEndDate(''); }}
+                    className="text-[10px] font-bold text-rose-600 hover:text-rose-800 hover:underline cursor-pointer"
+                  >
+                    Reset Tanggal
+                  </button>
+                )}
+              </div>
+              <input
+                type="date"
+                value={printDate}
+                onChange={(e) => setPrintDate(e.target.value)}
+                className="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+              />
+            </div>
           </div>
         </div>
 
@@ -458,6 +566,10 @@ export default function PrintReportModal({
                 <div>
                   <span className="font-semibold text-slate-500">Tanggal Rekapitulasi:</span>{' '}
                   <span className="font-mono font-bold text-slate-900">{formattedDateIndo}</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-slate-500">Periode Data:</span>{' '}
+                  <span className="font-mono font-bold text-blue-700">{formattedPeriodIndo}</span>
                 </div>
                 <div>
                   <span className="font-semibold text-slate-500">Status Filter:</span>{' '}
