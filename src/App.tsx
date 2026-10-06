@@ -65,7 +65,7 @@ import {
   Bell,
   BookOpen
 } from 'lucide-react';
-import { handleDownloadFile, handleDownloadPhotoPdf, exportActivitiesToExcel } from './lib/download';
+import { handleDownloadFile, handleDownloadPhotoPdf } from './lib/download';
 import { generateOperatorManualPDF } from './lib/pdfGenerator';
 
 import { 
@@ -1308,14 +1308,6 @@ export default function App() {
                 <p className="text-[9px] text-slate-400 uppercase font-bold leading-none">Terakhir Sinkronisasi</p>
                 <p className="text-xs font-bold text-slate-700 mt-1">Hari Ini, Real-time WIB</p>
               </div>
-              <button 
-                onClick={() => exportActivitiesToExcel(filteredActivitiesByYear)}
-                className="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-emerald-700 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
-                title="Ekspor seluruh data kegiatan dalam format CSV/Excel (Siap Copy-Paste ke Google Sheet V2)"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Ekspor Excel (Sheet V2)</span>
-              </button>
               <button 
                 onClick={() => window.print()}
                 className="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-700 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"

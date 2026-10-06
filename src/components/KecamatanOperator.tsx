@@ -25,7 +25,7 @@ import {
   Download,
   Image as ImageIcon
 } from 'lucide-react';
-import { handleDownloadFile, handleDownloadPhotoPdf, exportActivitiesToExcel } from '../lib/download';
+import { handleDownloadFile, handleDownloadPhotoPdf } from '../lib/download';
 
 interface KecamatanOperatorProps {
   activities: Activity[];
@@ -330,15 +330,6 @@ export default function KecamatanOperator({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => exportActivitiesToExcel(filteredActivities)}
-              className="flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
-              type="button"
-              title="Ekspor Seluruh Data Evaluasi Kecamatan dalam Format Excel (Siap Copy ke Sheet V2)"
-            >
-              <Download className="w-4 h-4 text-white" />
-              Ekspor Excel (Sheet V2)
-            </button>
             <button
               onClick={onTriggerPrintRecap}
               className="flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-lg transition-all border border-slate-300 cursor-pointer shadow-xs active:scale-95"
