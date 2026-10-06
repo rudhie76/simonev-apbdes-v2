@@ -1,0 +1,16 @@
+{
+  "short_name": "SIMONEV APBDes",
+  "name": "SIMONEV APBDes Waru - Penajam Paser Utara",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "display": "standalone",
+  "orientation": "portrait"
+}
