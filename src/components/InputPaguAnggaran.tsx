@@ -54,11 +54,19 @@ export default function InputPaguAnggaran({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Helper to retrieve the most recently synced pagu record for a village and year
+  // Helper to retrieve pagu record for a village and year (with fallback baseline)
   const getLatestPagu = (v: Village): SiskeudesPagu | undefined => {
-    const matches = paguList.filter(p => p.village === v && (p.year || 2026) === selectedYear);
-    if (matches.length === 0) return undefined;
-    return matches.sort((a, b) => new Date(b.lastSynced || 0).getTime() - new Date(a.lastSynced || 0).getTime())[0];
+    // 1. Exact match for village AND selectedYear
+    const exactMatches = paguList.filter(p => p.village === v && (p.year || 2026) === selectedYear);
+    if (exactMatches.length > 0) {
+      return exactMatches.sort((a, b) => new Date(b.lastSynced || 0).getTime() - new Date(a.lastSynced || 0).getTime())[0];
+    }
+    // 2. Fallback baseline from any year if no entry exists yet for selectedYear
+    const fallbackMatches = paguList.filter(p => p.village === v);
+    if (fallbackMatches.length > 0) {
+      return fallbackMatches.sort((a, b) => new Date(b.lastSynced || 0).getTime() - new Date(a.lastSynced || 0).getTime())[0];
+    }
+    return undefined;
   };
 
   // Sync state whenever targetVillage or selectedYear changes, pre-filling with current Firestore values
@@ -248,15 +256,20 @@ export default function InputPaguAnggaran({
         
         {/* Left Side: Form Fields */}
         <form onSubmit={handleSave} className="lg:col-span-7 p-6 space-y-6">
-          <div className="space-y-1">
-            <h2 className="text-base font-bold text-slate-800 flex items-center gap-1.5">
-              <span><Edit3 className="w-5 h-5 text-blue-500" /></span> Form Input Alokasi Anggaran - Desa {targetVillage}
-            </h2>
-            <p className="text-xs text-slate-500">
-              {isOperatorDesa 
-                ? 'Hak akses Anda terbatas pada pengeditan data Pagu APBDes desa Anda sendiri.' 
-                : 'Sebagai operator Kecamatan, Anda bebas memilih desa di atas dan menyunting pagunya.'}
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-800 flex items-center gap-1.5">
+                <span><Edit3 className="w-5 h-5 text-blue-500" /></span> Form Input Alokasi Anggaran - Desa {targetVillage}
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {isOperatorDesa 
+                  ? 'Hak akses Anda terbatas pada pengeditan data Pagu APBDes desa Anda sendiri.' 
+                  : 'Sebagai operator Kecamatan, Anda bebas memilih desa di atas dan menyunting pagunya.'}
+              </p>
+            </div>
+            <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-mono font-extrabold rounded-lg border border-blue-200 shrink-0 self-start sm:self-center">
+              TA {selectedYear}
+            </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -429,7 +442,7 @@ export default function InputPaguAnggaran({
               disabled={isSaving}
               className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl text-xs flex items-center gap-2 transition-all disabled:opacity-50 cursor-pointer shadow-md shadow-blue-500/10"
             >
-              {isSaving ? 'Menyimpan...' : 'Simpan Pagu Anggaran'}
+              {isSaving ? 'Menyimpan...' : `Simpan Pagu Anggaran TA ${selectedYear}`}
             </button>
           </div>
         </form>
