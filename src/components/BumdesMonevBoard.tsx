@@ -1628,16 +1628,6 @@ export default function BumdesMonevBoard({
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
               <button
                 type="button"
-                onClick={() => handleDownloadRktRabReport(selectedVillage, selectedYear, workPlans, rktDocName, rabDocName)}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
-                title="Unduh rekapitulasi data Modul 2 RKT & RAB untuk Monev Kecamatan"
-              >
-                <Download className="w-3.5 h-3.5" />
-                Unduh Rekap Monev Modul 2
-              </button>
-
-              <button
-                type="button"
                 onClick={handleDownloadRktRabTemplate}
                 className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer transition-colors border border-slate-300"
                 title="Unduh format / template Excel/CSV RKT & RAB"
@@ -1645,33 +1635,6 @@ export default function BumdesMonevBoard({
                 <Download className="w-3.5 h-3.5 text-indigo-600" />
                 Format Template
               </button>
-
-              {rktDocUrl && (
-                <a
-                  href={rktDocUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download={rktDocName || `Dokumen_RKT_Desa_${selectedVillage}.pdf`}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
-                  title="Unduh dokumen RKT yang diunggah oleh Desa"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Unduh RKT Desa
-                </a>
-              )}
-              {rabDocUrl && (
-                <a
-                  href={rabDocUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download={rabDocName || `Dokumen_RAB_Desa_${selectedVillage}.pdf`}
-                  className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
-                  title="Unduh dokumen RAB yang diunggah oleh Desa"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Unduh RAB Desa
-                </a>
-              )}
 
               {canEditVillageModules && (
                 <button
