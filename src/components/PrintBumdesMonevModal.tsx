@@ -473,7 +473,40 @@ export default function PrintBumdesMonevModal({
                       <Coins className="w-3.5 h-3.5" /> 4. Laporan Keuangan Utama & Inventaris Aset Tetap
                     </h4>
                     
-                    <p className="font-bold text-[11px] text-slate-800 mb-1.5 uppercase">4.1 Ringkasan Finansial Makro</p>
+                    <p className="font-bold text-[11px] text-slate-800 mb-1.5 uppercase">4.1 Ringkasan Finansial Makro & Dokumen Penyertaan Modal</p>
+                    
+                    <div className="mb-2.5 grid grid-cols-2 gap-2 text-[11px] bg-slate-50 border border-slate-300 p-2 rounded">
+                      <div className="flex items-center justify-between gap-2">
+                        <span><strong>Analisa Kelayakan Modal:</strong> {report.feasibilityStudyPdfName ? `📄 ${report.feasibilityStudyPdfName}` : 'Belum diunggah oleh Desa'}</span>
+                        {report.feasibilityStudyPdfUrl && (
+                          <a
+                            href={report.feasibilityStudyPdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={report.feasibilityStudyPdfName || 'Dokumen_Analisa_Kelayakan'}
+                            className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
+                            title="Unduh Dokumen Analisa Kelayakan Modal"
+                          >
+                            <Download className="w-3 h-3" /> Unduh
+                          </a>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span><strong>SK Penyertaan Modal ({report.year}):</strong> {report.skCapitalPdfName ? `📄 ${report.skCapitalPdfName}` : 'Belum diunggah oleh Desa'}</span>
+                        {report.skCapitalPdfUrl && (
+                          <a
+                            href={report.skCapitalPdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={report.skCapitalPdfName || 'SK_Penyertaan_Modal'}
+                            className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
+                            title="Unduh SK Penyertaan Modal"
+                          >
+                            <Download className="w-3 h-3" /> Unduh
+                          </a>
+                        )}
+                      </div>
+                    </div>
                     <table className="w-full text-left border border-slate-300 mb-3 text-[10.5px]">
                       <thead>
                         <tr className="border-b border-slate-300 bg-slate-100 font-bold">

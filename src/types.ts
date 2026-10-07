@@ -226,6 +226,12 @@ export interface BumdesMonev {
   capitalParticipationPrevYear?: number; // Modal s.d. Tahun Sebelum
   capitalParticipationCurrentYear?: number; // Modal Tahun Berjalan
 
+  // Dokumen Penyertaan Modal (Modul 3)
+  feasibilityStudyPdfName?: string; // Dokumen Analisa Kelayakan Penyertaan Modal
+  feasibilityStudyPdfUrl?: string;
+  skCapitalPdfName?: string; // Dokumen SK Penyertaan Modal Sesuai Tahun Anggaran
+  skCapitalPdfUrl?: string;
+
   totalAssets: number; // Total Aset (Kumulatif / Total Terjumlah)
   totalAssetsPrevYear?: number;
   totalAssetsCurrentYear?: number;

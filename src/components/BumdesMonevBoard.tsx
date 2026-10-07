@@ -127,6 +127,12 @@ export default function BumdesMonevBoard({
   const [capitalParticipationCurrentYear, setCapitalParticipationCurrentYear] = useState<number>(0);
   const [capitalParticipation, setCapitalParticipation] = useState<number>(0);
 
+  // Modul 3: Dokumen Penyertaan Modal
+  const [feasibilityStudyPdfName, setFeasibilityStudyPdfName] = useState('');
+  const [feasibilityStudyPdfUrl, setFeasibilityStudyPdfUrl] = useState('');
+  const [skCapitalPdfName, setSkCapitalPdfName] = useState('');
+  const [skCapitalPdfUrl, setSkCapitalPdfUrl] = useState('');
+
   const [totalAssetsPrevYear, setTotalAssetsPrevYear] = useState<number>(0);
   const [totalAssetsCurrentYear, setTotalAssetsCurrentYear] = useState<number>(0);
   const [totalAssets, setTotalAssets] = useState<number>(0);
@@ -210,6 +216,11 @@ export default function BumdesMonevBoard({
       setCapitalParticipationCurrentYear(capCurr);
       setCapitalParticipation(capPrev + capCurr);
 
+      setFeasibilityStudyPdfName(report.feasibilityStudyPdfName || '');
+      setFeasibilityStudyPdfUrl(report.feasibilityStudyPdfUrl || '');
+      setSkCapitalPdfName(report.skCapitalPdfName || '');
+      setSkCapitalPdfUrl(report.skCapitalPdfUrl || '');
+
       const astPrev = report.totalAssetsPrevYear ?? 0;
       const astCurr = report.totalAssetsCurrentYear ?? (report.totalAssets || 0);
       setTotalAssetsPrevYear(astPrev);
@@ -277,6 +288,10 @@ export default function BumdesMonevBoard({
       setCapitalParticipationPrevYear(0);
       setCapitalParticipationCurrentYear(0);
       setCapitalParticipation(0);
+      setFeasibilityStudyPdfName('');
+      setFeasibilityStudyPdfUrl('');
+      setSkCapitalPdfName('');
+      setSkCapitalPdfUrl('');
 
       setTotalAssetsPrevYear(0);
       setTotalAssetsCurrentYear(0);
@@ -471,6 +486,11 @@ export default function BumdesMonevBoard({
         capitalParticipationPrevYear,
         capitalParticipationCurrentYear,
         capitalParticipation: capitalParticipationPrevYear + capitalParticipationCurrentYear,
+
+        feasibilityStudyPdfName: overrides?.feasibilityStudyPdfName ?? feasibilityStudyPdfName,
+        feasibilityStudyPdfUrl: overrides?.feasibilityStudyPdfUrl ?? feasibilityStudyPdfUrl,
+        skCapitalPdfName: overrides?.skCapitalPdfName ?? skCapitalPdfName,
+        skCapitalPdfUrl: overrides?.skCapitalPdfUrl ?? skCapitalPdfUrl,
 
         totalAssetsPrevYear,
         totalAssetsCurrentYear,
@@ -2192,6 +2212,87 @@ export default function BumdesMonevBoard({
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            {/* Upload Dokumen Pendukung Penyertaan Modal (Modul 3) */}
+            <div className="p-4 bg-emerald-50/40 rounded-xl border border-emerald-200/80 space-y-3 mt-3">
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+                <FileCheck className="w-4 h-4 text-emerald-600" />
+                Dokumen Pendukung Penyertaan Modal ({selectedYear})
+              </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                {/* 1. Dokumen Analisa Kelayakan Penyertaan Modal */}
+                <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-800">1. Dokumen Analisa Kelayakan Penyertaan Modal</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {canEditVillageModules && (
+                      <label className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer select-none">
+                        <Upload className="w-3.5 h-3.5" /> {uploadingStatus['feasibility_study'] ? 'Mengunggah...' : 'Unggah PDF/Gambar'}
+                        <input
+                          type="file"
+                          accept=".pdf, image/*"
+                          onChange={(e) => handleBumdesFileChange(e, setFeasibilityStudyPdfName, setFeasibilityStudyPdfUrl, 'feasibility_study')}
+                          className="hidden"
+                          disabled={uploadingStatus['feasibility_study']}
+                        />
+                      </label>
+                    )}
+                    <span className="text-[10px] text-slate-500 font-medium truncate max-w-[150px]">
+                      {feasibilityStudyPdfName || 'Belum ada dokumen'}
+                    </span>
+                    {feasibilityStudyPdfUrl && (
+                      <a
+                        href={feasibilityStudyPdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download={feasibilityStudyPdfName || 'Dokumen_Analisa_Kelayakan'}
+                        className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-md text-[10px] shadow-2xs transition-colors"
+                        title="Unduh Dokumen Analisa Kelayakan"
+                      >
+                        <Download className="w-3 h-3" /> Unduh
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Dokumen SK Penyertaan Modal Sesuai Tahun Anggaran */}
+                <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-800">2. Dokumen SK Penyertaan Modal (TA {selectedYear})</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {canEditVillageModules && (
+                      <label className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer select-none">
+                        <Upload className="w-3.5 h-3.5" /> {uploadingStatus['sk_capital'] ? 'Mengunggah...' : 'Unggah PDF/Gambar'}
+                        <input
+                          type="file"
+                          accept=".pdf, image/*"
+                          onChange={(e) => handleBumdesFileChange(e, setSkCapitalPdfName, setSkCapitalPdfUrl, 'sk_capital')}
+                          className="hidden"
+                          disabled={uploadingStatus['sk_capital']}
+                        />
+                      </label>
+                    )}
+                    <span className="text-[10px] text-slate-500 font-medium truncate max-w-[150px]">
+                      {skCapitalPdfName || 'Belum ada dokumen'}
+                    </span>
+                    {skCapitalPdfUrl && (
+                      <a
+                        href={skCapitalPdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download={skCapitalPdfName || 'SK_Penyertaan_Modal'}
+                        className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-md text-[10px] shadow-2xs transition-colors"
+                        title="Unduh SK Penyertaan Modal"
+                      >
+                        <Download className="w-3 h-3" /> Unduh
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
