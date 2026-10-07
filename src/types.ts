@@ -269,3 +269,42 @@ export interface BumdesMonev {
   reviewedAt?: string;
 }
 
+/**
+ * Helper to extract array of Musdes photo URLs from a BumdesMonev record.
+ * Handles both musdesPhotos array and delimiter/JSON-encoded musdesPhotoUrl strings.
+ */
+export function parseMusdesPhotos(report?: Partial<BumdesMonev> | null): string[] {
+  if (!report) return [];
+
+  // 1. Return musdesPhotos array if available and non-empty
+  if (Array.isArray(report.musdesPhotos) && report.musdesPhotos.length > 0) {
+    return report.musdesPhotos.filter(Boolean);
+  }
+
+  // 2. Parse musdesPhotoUrl string if available
+  if (report.musdesPhotoUrl) {
+    const raw = String(report.musdesPhotoUrl).trim();
+    if (!raw) return [];
+
+    // JSON array string
+    if (raw.startsWith('[')) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.filter(Boolean);
+        }
+      } catch (e) {}
+    }
+
+    // Delimited string
+    if (raw.includes('|||')) {
+      return raw.split('|||').map(s => s.trim()).filter(Boolean);
+    }
+
+    // Single photo URL
+    return [raw];
+  }
+
+  return [];
+}
+

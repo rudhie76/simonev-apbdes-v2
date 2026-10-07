@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { BumdesMonev, Village, BumdesHealthScore } from '../types';
+import { BumdesMonev, Village, BumdesHealthScore, parseMusdesPhotos } from '../types';
 import { Printer, X, Building2, Calendar, ShieldCheck, FileText, Briefcase, Users, Coins, Image as ImageIcon, FileSpreadsheet, Box, Download } from 'lucide-react';
 import { LOGO_BASE64 } from '../assets/logoBase64';
 
@@ -671,15 +671,13 @@ export default function PrintBumdesMonevModal({
                   </div>
 
                   {/* SECTION 8: DOKUMENTASI FOTO KEGIATAN MUSDES */}
-                  {((report.musdesPhotos && report.musdesPhotos.length > 0) || report.musdesPhotoUrl) && (
+                  {parseMusdesPhotos(report).length > 0 && (
                     <div className="pt-2">
                       <h4 className="text-xs font-bold text-slate-950 border-b border-slate-400 pb-1 mb-2 uppercase flex items-center gap-1.5">
                         <ImageIcon className="w-3.5 h-3.5" /> 8. Lampiran Dokumentasi Foto Kegiatan Musdes (Maks 4 Foto)
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 border border-slate-300 p-2 bg-slate-50/40 rounded">
-                        {(report.musdesPhotos && report.musdesPhotos.length > 0 
-                          ? report.musdesPhotos 
-                          : [report.musdesPhotoUrl!]).slice(0, 4).map((photoUrl, idx) => (
+                        {parseMusdesPhotos(report).slice(0, 4).map((photoUrl, idx) => (
                           <div key={idx} className="border border-slate-300 bg-white p-1 rounded text-center space-y-1">
                             <img 
                               src={photoUrl} 

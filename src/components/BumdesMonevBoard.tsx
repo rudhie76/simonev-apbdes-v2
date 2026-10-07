@@ -18,7 +18,8 @@ import {
   BumdesAssetItem,
   AssetItemType,
   AssetCondition,
-  AssetOwnershipDoc
+  AssetOwnershipDoc,
+  parseMusdesPhotos
 } from '../types';
 import { 
   Building2, 
@@ -195,12 +196,10 @@ export default function BumdesMonevBoard({
       setMusdesDate(report.musdesDate || '');
       setMusdesBaPdfName(report.musdesBaPdfName || '');
       setMusdesBaPdfUrl(report.musdesBaPdfUrl || '');
-      setMusdesPhotoName(report.musdesPhotoName || '');
-      setMusdesPhotoUrl(report.musdesPhotoUrl || '');
-      const loadedPhotos = report.musdesPhotos && report.musdesPhotos.length > 0 
-        ? report.musdesPhotos 
-        : (report.musdesPhotoUrl ? [report.musdesPhotoUrl] : []);
+      const loadedPhotos = parseMusdesPhotos(report);
       setMusdesPhotos(loadedPhotos);
+      setMusdesPhotoUrl(report.musdesPhotoUrl || (loadedPhotos.length > 0 ? loadedPhotos.join('|||') : ''));
+      setMusdesPhotoName(report.musdesPhotoName || (loadedPhotos.length > 0 ? `${loadedPhotos.length} Foto Musdes` : ''));
 
       setRktDocName(report.rktDocName || '');
       setRktDocUrl(report.rktDocUrl || '');
@@ -433,7 +432,7 @@ export default function BumdesMonevBoard({
     try {
       setIsSaving(true);
       const targetMusdesPhotos = overrides?.musdesPhotos ?? musdesPhotos;
-      const targetMusdesPhotoUrl = overrides?.musdesPhotoUrl ?? (targetMusdesPhotos[0] || musdesPhotoUrl);
+      const targetMusdesPhotoUrl = overrides?.musdesPhotoUrl ?? (targetMusdesPhotos.length > 0 ? targetMusdesPhotos.join('|||') : musdesPhotoUrl);
       const targetMusdesPhotoName = overrides?.musdesPhotoName ?? (targetMusdesPhotos.length > 0 ? `${targetMusdesPhotos.length} Foto Musdes` : musdesPhotoName);
 
       const targetRktDocName = overrides?.rktDocName ?? rktDocName;
@@ -674,17 +673,17 @@ export default function BumdesMonevBoard({
     }
 
     const currentCount = musdesPhotos.length;
-    const remainingSlots = 2 - currentCount;
+    const remainingSlots = 4 - currentCount;
 
     if (remainingSlots <= 0) {
-      alert("Batas maksimum 2 foto kegiatan Musdes telah tercapai. Hapus salah satu foto terlebih dahulu jika ingin mengganti.");
+      alert("Batas maksimum 4 foto kegiatan Musdes telah tercapai. Hapus salah satu foto terlebih dahulu jika ingin mengganti.");
       e.target.value = '';
       return;
     }
 
     let filesToProcess = fileList;
     if (fileList.length > remainingSlots) {
-      alert(`Anda memilih ${fileList.length} foto. Karena batas maksimum adalah 2 foto, hanya ${remainingSlots} foto pertama yang akan diproses.`);
+      alert(`Anda memilih ${fileList.length} foto. Karena batas maksimum adalah 4 foto, hanya ${remainingSlots} foto pertama yang akan diproses.`);
       filesToProcess = fileList.slice(0, remainingSlots);
     }
 
@@ -719,8 +718,9 @@ export default function BumdesMonevBoard({
 
     if (newCompressedPhotos.length > 0) {
       const updatedList = [...musdesPhotos, ...newCompressedPhotos].slice(0, 4);
+      const joinedPhotos = updatedList.join('|||');
       setMusdesPhotos(updatedList);
-      setMusdesPhotoUrl(updatedList[0] || '');
+      setMusdesPhotoUrl(joinedPhotos);
       setMusdesPhotoName(`${updatedList.length} Foto Musdes`);
 
       const origSizeStr = formatFileSize(totalOrigBytes);
@@ -740,7 +740,7 @@ export default function BumdesMonevBoard({
       // Auto-save photo batch
       await autoSaveWithOverrides({
         musdesPhotos: updatedList,
-        musdesPhotoUrl: updatedList[0] || '',
+        musdesPhotoUrl: joinedPhotos,
         musdesPhotoName: `${updatedList.length} Foto Musdes`
       });
     }
@@ -751,12 +751,13 @@ export default function BumdesMonevBoard({
 
   const handleRemoveMusdesPhoto = async (indexToRemove: number) => {
     const updated = musdesPhotos.filter((_, idx) => idx !== indexToRemove);
+    const joinedPhotos = updated.join('|||');
     setMusdesPhotos(updated);
-    setMusdesPhotoUrl(updated[0] || '');
+    setMusdesPhotoUrl(joinedPhotos);
     setMusdesPhotoName(updated.length > 0 ? `${updated.length} Foto Musdes` : '');
     await autoSaveWithOverrides({
       musdesPhotos: updated,
-      musdesPhotoUrl: updated[0] || '',
+      musdesPhotoUrl: joinedPhotos,
       musdesPhotoName: updated.length > 0 ? `${updated.length} Foto Musdes` : ''
     });
   };
@@ -1489,22 +1490,22 @@ export default function BumdesMonevBoard({
                   </div>
                 </div>
 
-                 {/* Upload Multi-Foto Kegiatan Musdes (Maks 2 Foto) */}
+                 {/* Upload Multi-Foto Kegiatan Musdes (Maks 4 Foto) */}
                 <div className="space-y-1.5 md:col-span-1">
                   <div className="flex items-center justify-between">
                     <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
                       <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
-                      Foto Kegiatan Musdes (Maks. 2 Foto)
+                      Foto Kegiatan Musdes (Maks. 4 Foto)
                     </label>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                      {musdesPhotos.length} / 2 Foto
+                      {musdesPhotos.length} / 4 Foto
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {canEditVillageModules && (
                       <label className={`bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-[10px] font-bold flex items-center gap-1.5 cursor-pointer select-none whitespace-nowrap transition-all shadow-xs ${
-                        musdesPhotos.length >= 2 || uploadingStatus['musdes_photos_batch'] ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
+                        musdesPhotos.length >= 4 || uploadingStatus['musdes_photos_batch'] ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
                       }`}>
                         <Upload className="w-3.5 h-3.5" /> 
                         {uploadingStatus['musdes_photos_batch'] ? 'Mengompres & Mengunggah...' : 'Pilih Foto (Bisa Sekaligus)'}
@@ -1514,7 +1515,7 @@ export default function BumdesMonevBoard({
                           multiple
                           onChange={handleMultipleMusdesPhotosChange}
                           className="hidden"
-                          disabled={musdesPhotos.length >= 2 || uploadingStatus['musdes_photos_batch']}
+                          disabled={musdesPhotos.length >= 4 || uploadingStatus['musdes_photos_batch']}
                         />
                       </label>
                     )}

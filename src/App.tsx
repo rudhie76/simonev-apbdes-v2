@@ -15,7 +15,8 @@ import {
   SiskeudesPagu,
   BumdesMonev,
   RegisteredAccount,
-  UserStatus
+  UserStatus,
+  parseMusdesPhotos
 } from './types';
 import { 
   INITIAL_ACTIVITIES, 
@@ -521,7 +522,13 @@ export default function App() {
         } else {
           const bList: BumdesMonev[] = [];
           snapshot.forEach((docSnap) => {
-            bList.push(docSnap.data() as BumdesMonev);
+            const raw = docSnap.data() as BumdesMonev;
+            const photos = parseMusdesPhotos(raw);
+            bList.push({
+              ...raw,
+              musdesPhotos: photos,
+              musdesPhotoUrl: raw.musdesPhotoUrl || (photos.length > 0 ? photos.join('|||') : '')
+            });
           });
           setBumdesMonevList(bList);
         }
