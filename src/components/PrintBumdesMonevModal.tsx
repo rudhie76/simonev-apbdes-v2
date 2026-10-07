@@ -492,15 +492,15 @@ export default function PrintBumdesMonevModal({
                         )}
                       </div>
                       <div className="flex items-center justify-between gap-2">
-                        <span><strong>SK Penyertaan Modal ({report.year}):</strong> {report.skCapitalPdfName ? `📄 ${report.skCapitalPdfName}` : 'Belum diunggah oleh Desa'}</span>
-                        {report.skCapitalPdfUrl && (
+                        <span><strong>Perdes Penyertaan Modal ({report.year}):</strong> {(report.perdesCapitalPdfName || report.skCapitalPdfName) ? `📄 ${report.perdesCapitalPdfName || report.skCapitalPdfName}` : 'Belum diunggah oleh Desa'}</span>
+                        {(report.perdesCapitalPdfUrl || report.skCapitalPdfUrl) && (
                           <a
-                            href={report.skCapitalPdfUrl}
+                            href={report.perdesCapitalPdfUrl || report.skCapitalPdfUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            download={report.skCapitalPdfName || 'SK_Penyertaan_Modal'}
+                            download={report.perdesCapitalPdfName || report.skCapitalPdfName || 'Perdes_Penyertaan_Modal'}
                             className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
-                            title="Unduh SK Penyertaan Modal"
+                            title="Unduh Perdes Penyertaan Modal"
                           >
                             <Download className="w-3 h-3" /> Unduh
                           </a>

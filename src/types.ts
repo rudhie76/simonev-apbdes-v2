@@ -229,7 +229,9 @@ export interface BumdesMonev {
   // Dokumen Penyertaan Modal (Modul 3)
   feasibilityStudyPdfName?: string; // Dokumen Analisa Kelayakan Penyertaan Modal
   feasibilityStudyPdfUrl?: string;
-  skCapitalPdfName?: string; // Dokumen SK Penyertaan Modal Sesuai Tahun Anggaran
+  perdesCapitalPdfName?: string; // Dokumen Perdes Penyertaan Modal Sesuai Tahun Anggaran
+  perdesCapitalPdfUrl?: string;
+  skCapitalPdfName?: string; // Fallback legacy SK
   skCapitalPdfUrl?: string;
 
   totalAssets: number; // Total Aset (Kumulatif / Total Terjumlah)

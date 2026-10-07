@@ -130,8 +130,8 @@ export default function BumdesMonevBoard({
   // Modul 3: Dokumen Penyertaan Modal
   const [feasibilityStudyPdfName, setFeasibilityStudyPdfName] = useState('');
   const [feasibilityStudyPdfUrl, setFeasibilityStudyPdfUrl] = useState('');
-  const [skCapitalPdfName, setSkCapitalPdfName] = useState('');
-  const [skCapitalPdfUrl, setSkCapitalPdfUrl] = useState('');
+  const [perdesCapitalPdfName, setPerdesCapitalPdfName] = useState('');
+  const [perdesCapitalPdfUrl, setPerdesCapitalPdfUrl] = useState('');
 
   const [totalAssetsPrevYear, setTotalAssetsPrevYear] = useState<number>(0);
   const [totalAssetsCurrentYear, setTotalAssetsCurrentYear] = useState<number>(0);
@@ -218,8 +218,8 @@ export default function BumdesMonevBoard({
 
       setFeasibilityStudyPdfName(report.feasibilityStudyPdfName || '');
       setFeasibilityStudyPdfUrl(report.feasibilityStudyPdfUrl || '');
-      setSkCapitalPdfName(report.skCapitalPdfName || '');
-      setSkCapitalPdfUrl(report.skCapitalPdfUrl || '');
+      setPerdesCapitalPdfName(report.perdesCapitalPdfName || report.skCapitalPdfName || '');
+      setPerdesCapitalPdfUrl(report.perdesCapitalPdfUrl || report.skCapitalPdfUrl || '');
 
       const astPrev = report.totalAssetsPrevYear ?? 0;
       const astCurr = report.totalAssetsCurrentYear ?? (report.totalAssets || 0);
@@ -290,8 +290,8 @@ export default function BumdesMonevBoard({
       setCapitalParticipation(0);
       setFeasibilityStudyPdfName('');
       setFeasibilityStudyPdfUrl('');
-      setSkCapitalPdfName('');
-      setSkCapitalPdfUrl('');
+      setPerdesCapitalPdfName('');
+      setPerdesCapitalPdfUrl('');
 
       setTotalAssetsPrevYear(0);
       setTotalAssetsCurrentYear(0);
@@ -489,8 +489,10 @@ export default function BumdesMonevBoard({
 
         feasibilityStudyPdfName: overrides?.feasibilityStudyPdfName ?? feasibilityStudyPdfName,
         feasibilityStudyPdfUrl: overrides?.feasibilityStudyPdfUrl ?? feasibilityStudyPdfUrl,
-        skCapitalPdfName: overrides?.skCapitalPdfName ?? skCapitalPdfName,
-        skCapitalPdfUrl: overrides?.skCapitalPdfUrl ?? skCapitalPdfUrl,
+        perdesCapitalPdfName: overrides?.perdesCapitalPdfName ?? perdesCapitalPdfName,
+        perdesCapitalPdfUrl: overrides?.perdesCapitalPdfUrl ?? perdesCapitalPdfUrl,
+        skCapitalPdfName: overrides?.perdesCapitalPdfName ?? perdesCapitalPdfName,
+        skCapitalPdfUrl: overrides?.perdesCapitalPdfUrl ?? perdesCapitalPdfUrl,
 
         totalAssetsPrevYear,
         totalAssetsCurrentYear,
@@ -2257,35 +2259,35 @@ export default function BumdesMonevBoard({
                   </div>
                 </div>
 
-                {/* 2. Dokumen SK Penyertaan Modal Sesuai Tahun Anggaran */}
+                {/* 2. Dokumen Perdes Penyertaan Modal Sesuai Tahun Anggaran */}
                 <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-800">2. Dokumen SK Penyertaan Modal (TA {selectedYear})</span>
+                    <span className="font-bold text-slate-800">2. Dokumen Perdes Penyertaan Modal (TA {selectedYear})</span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     {canEditVillageModules && (
                       <label className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer select-none">
-                        <Upload className="w-3.5 h-3.5" /> {uploadingStatus['sk_capital'] ? 'Mengunggah...' : 'Unggah PDF/Gambar'}
+                        <Upload className="w-3.5 h-3.5" /> {uploadingStatus['perdes_capital'] ? 'Mengunggah...' : 'Unggah PDF/Gambar'}
                         <input
                           type="file"
                           accept=".pdf, image/*"
-                          onChange={(e) => handleBumdesFileChange(e, setSkCapitalPdfName, setSkCapitalPdfUrl, 'sk_capital')}
+                          onChange={(e) => handleBumdesFileChange(e, setPerdesCapitalPdfName, setPerdesCapitalPdfUrl, 'perdes_capital')}
                           className="hidden"
-                          disabled={uploadingStatus['sk_capital']}
+                          disabled={uploadingStatus['perdes_capital']}
                         />
                       </label>
                     )}
                     <span className="text-[10px] text-slate-500 font-medium truncate max-w-[150px]">
-                      {skCapitalPdfName || 'Belum ada dokumen'}
+                      {perdesCapitalPdfName || 'Belum ada dokumen'}
                     </span>
-                    {skCapitalPdfUrl && (
+                    {perdesCapitalPdfUrl && (
                       <a
-                        href={skCapitalPdfUrl}
+                        href={perdesCapitalPdfUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        download={skCapitalPdfName || 'SK_Penyertaan_Modal'}
+                        download={perdesCapitalPdfName || 'Perdes_Penyertaan_Modal'}
                         className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-md text-[10px] shadow-2xs transition-colors"
-                        title="Unduh SK Penyertaan Modal"
+                        title="Unduh Perdes Penyertaan Modal"
                       >
                         <Download className="w-3 h-3" /> Unduh
                       </a>
