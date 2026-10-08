@@ -291,7 +291,7 @@ export default function PrintBumdesMonevModal({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   download={report.certificatePdfName || 'Sertifikat_Kemendesa'}
-                                  className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
+                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
                                   title="Unduh Berkas Sertifikat"
                                 >
                                   <Download className="w-3 h-3" /> Unduh
@@ -314,7 +314,7 @@ export default function PrintBumdesMonevModal({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   download={report.perdesPdfName || 'Perdes_Pendirian'}
-                                  className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
+                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
                                   title="Unduh Perdes Pendirian"
                                 >
                                   <Download className="w-3 h-3" /> Unduh
@@ -337,7 +337,7 @@ export default function PrintBumdesMonevModal({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   download={report.adArtPdfName || 'AD_ART_BUMDes'}
-                                  className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
+                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
                                   title="Unduh AD/ART"
                                 >
                                   <Download className="w-3 h-3" /> Unduh
@@ -360,7 +360,7 @@ export default function PrintBumdesMonevModal({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   download={report.skPengelolaPdfName || 'SK_Pengelola'}
-                                  className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
+                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
                                   title="Unduh SK Pengelola"
                                 >
                                   <Download className="w-3 h-3" /> Unduh
@@ -383,7 +383,7 @@ export default function PrintBumdesMonevModal({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   download={report.musdesBaPdfName || 'Berita_Acara_Musdes'}
-                                  className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
+                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
                                   title="Unduh Berita Acara Musdes"
                                 >
                                   <Download className="w-3 h-3" /> Unduh
@@ -411,7 +411,7 @@ export default function PrintBumdesMonevModal({
                             target="_blank"
                             rel="noopener noreferrer"
                             download={report.rktDocName || 'Dokumen_RKT_Unggahan_Desa'}
-                            className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
+                            className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
                             title="Unduh Dokumen RKT Hasil Unggahan Desa"
                           >
                             <Download className="w-3 h-3" /> Unduh RKT Unggahan Desa
@@ -426,7 +426,7 @@ export default function PrintBumdesMonevModal({
                             target="_blank"
                             rel="noopener noreferrer"
                             download={report.rabDocName || 'Dokumen_RAB_Unggahan_Desa'}
-                            className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
+                            className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
                             title="Unduh Dokumen RAB Hasil Unggahan Desa"
                           >
                             <Download className="w-3 h-3" /> Unduh RAB Unggahan Desa
@@ -484,7 +484,7 @@ export default function PrintBumdesMonevModal({
                             target="_blank"
                             rel="noopener noreferrer"
                             download={report.feasibilityStudyPdfName || 'Dokumen_Analisa_Kelayakan'}
-                            className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
+                            className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
                             title="Unduh Dokumen Analisa Kelayakan Modal"
                           >
                             <Download className="w-3 h-3" /> Unduh
@@ -499,7 +499,7 @@ export default function PrintBumdesMonevModal({
                             target="_blank"
                             rel="noopener noreferrer"
                             download={report.perdesCapitalPdfName || report.skCapitalPdfName || 'Perdes_Penyertaan_Modal'}
-                            className="print:hidden inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
+                            className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
                             title="Unduh Perdes Penyertaan Modal"
                           >
                             <Download className="w-3 h-3" /> Unduh
@@ -691,7 +691,7 @@ export default function PrintBumdesMonevModal({
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 download={`Foto_Musdes_${idx + 1}.jpg`}
-                                className="print:hidden inline-flex items-center gap-0.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-2xs transition-colors"
+                                className="print:hidden print:!hidden no-print inline-flex items-center gap-0.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-2xs transition-colors"
                                 title="Unduh Foto Musdes"
                               >
                                 <Download className="w-2.5 h-2.5" /> Unduh

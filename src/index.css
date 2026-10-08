@@ -27,12 +27,17 @@
     background: white !important;
   }
 
-  /* Hide navigation, sidebar, and headers */
+  /* Hide navigation, sidebar, headers, download buttons, and print-hidden elements */
   aside, 
   header, 
   footer,
   #simonev-apbdes-app > div:not(.fixed),
-  .print\:hidden {
+  .print\:hidden,
+  .print\:\!hidden,
+  [class*="print:hidden"],
+  [class*="print:!hidden"],
+  a[download],
+  .no-print {
     display: none !important;
   }
 
