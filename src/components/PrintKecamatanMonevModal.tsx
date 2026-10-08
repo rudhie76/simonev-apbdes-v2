@@ -387,22 +387,19 @@ export default function PrintKecamatanMonevModal({
           >
             {/* Header Kop Surat Resmi */}
             <div>
-              <div className="flex items-center justify-between border-b-4 border-double border-slate-900 pb-3 mb-4">
-                <div className="w-16 h-16 shrink-0 flex items-center justify-center">
-                  <img src={LOGO_BASE64} alt="Logo Penajam Paser Utara" className="w-14 h-14 object-contain" />
-                </div>
-
-                <div className="text-center flex-1 px-4 leading-tight">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">Pemerintah Kabupaten Penajam Paser Utara</h3>
-                  <h2 className="text-base sm:text-lg font-black uppercase tracking-wide text-slate-950 mt-0.5">Kecamatan Waru</h2>
-                  <h4 className="text-xs font-extrabold uppercase tracking-wide text-blue-900 mt-0.5">Tim Pembina & Evaluator APBDes - BUMDes</h4>
-                  <p className="text-[9.5px] text-slate-600 font-medium mt-1">
-                    Jalan Musyawarah No. 01 Kecamatan Waru, Penajam Paser Utara, Kalimantan Timur 76284
-                  </p>
-                </div>
-
-                <div className="w-16 h-16 shrink-0 flex items-center justify-center border border-slate-300 rounded p-1 text-[8px] font-bold text-center text-slate-400 uppercase">
-                  Dokumen Resmi
+              <div className="border-b-4 border-double border-slate-950 pb-4 text-center select-none mb-4">
+                <div className="flex items-center justify-center gap-4">
+                  <img 
+                    src={LOGO_BASE64} 
+                    alt="Logo Kabupaten Penajam Paser Utara" 
+                    className="w-14 h-16 object-contain shrink-0"
+                  />
+                  <div>
+                    <h3 className="text-sm font-bold tracking-widest uppercase text-slate-950">PEMERINTAH KABUPATEN PENAJAM PASER UTARA</h3>
+                    <h2 className="text-lg font-extrabold uppercase text-slate-950 tracking-tight leading-normal">KECAMATAN WARU</h2>
+                    <p className="text-[10px] text-slate-600 font-medium">Jl. Negara Propinsi Km. 25 RT. 04, Kode Pos 76282, Waru, Penajam Paser Utara, Kalimantan Timur</p>
+                    <p className="text-[9px] text-slate-500 font-mono mt-0.5">Situs Dashboard Real-Time: https://rudhie76.github.io/simonev-apbdes-v2/</p>
+                  </div>
                 </div>
               </div>
 

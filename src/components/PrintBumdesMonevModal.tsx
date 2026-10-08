@@ -212,7 +212,7 @@ export default function PrintBumdesMonevModal({
                     <h3 className="text-sm font-bold tracking-widest uppercase text-slate-950">PEMERINTAH KABUPATEN PENAJAM PASER UTARA</h3>
                     <h2 className="text-lg font-extrabold uppercase text-slate-950 tracking-tight leading-normal">KECAMATAN WARU</h2>
                     <p className="text-[10px] text-slate-600 font-medium">Jl. Negara Propinsi Km. 25 RT. 04, Kode Pos 76282, Waru, Penajam Paser Utara, Kalimantan Timur</p>
-                    <p className="text-[9px] text-slate-500 font-mono mt-0.5">Laporan Resmi Sistem Monitoring & Evaluasi Kinerja Desa Terpadu</p>
+                    <p className="text-[9px] text-slate-500 font-mono mt-0.5">Situs Dashboard Real-Time: https://rudhie76.github.io/simonev-apbdes-v2/</p>
                   </div>
                 </div>
               </div>
