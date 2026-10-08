@@ -69,7 +69,8 @@ import {
   Settings,
   LogOut,
   Bell,
-  BookOpen
+  BookOpen,
+  Printer
 } from 'lucide-react';
 import { handleDownloadFile, handleDownloadPhotoPdf } from './lib/download';
 import { generateOperatorManualPDF } from './lib/pdfGenerator';
