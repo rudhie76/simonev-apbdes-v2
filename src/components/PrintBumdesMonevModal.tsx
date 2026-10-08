@@ -283,21 +283,7 @@ export default function PrintBumdesMonevModal({
                             <span className="font-semibold">{report.lawStatus}</span>
                           </td>
                           <td className="p-2 italic text-slate-600">
-                            <div className="flex items-center justify-between gap-2">
-                              <span>{report.certificatePdfName ? `Berkas: ${report.certificatePdfName}` : 'Tidak ada berkas'}</span>
-                              {report.certificatePdfUrl && (
-                                <a
-                                  href={report.certificatePdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download={report.certificatePdfName || 'Sertifikat_Kemendesa'}
-                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
-                                  title="Unduh Berkas Sertifikat"
-                                >
-                                  <Download className="w-3 h-3" /> Unduh
-                                </a>
-                              )}
-                            </div>
+                            <span>{report.certificatePdfName ? `Berkas: ${report.certificatePdfName}` : 'Tidak ada berkas'}</span>
                           </td>
                         </tr>
                         <tr className="border-b border-slate-300 bg-slate-50/50">
@@ -306,21 +292,7 @@ export default function PrintBumdesMonevModal({
                             {report.hasPerdesPendirian ? 'ADA' : 'BELUM ADA'}
                           </td>
                           <td className="p-2 italic text-slate-600">
-                            <div className="flex items-center justify-between gap-2">
-                              <span>{report.perdesPdfName ? `Berkas: ${report.perdesPdfName}` : '-'}</span>
-                              {report.perdesPdfUrl && (
-                                <a
-                                  href={report.perdesPdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download={report.perdesPdfName || 'Perdes_Pendirian'}
-                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
-                                  title="Unduh Perdes Pendirian"
-                                >
-                                  <Download className="w-3 h-3" /> Unduh
-                                </a>
-                              )}
-                            </div>
+                            <span>{report.perdesPdfName ? `Berkas: ${report.perdesPdfName}` : '-'}</span>
                           </td>
                         </tr>
                         <tr className="border-b border-slate-300">
@@ -329,21 +301,7 @@ export default function PrintBumdesMonevModal({
                             {report.hasAdArt ? 'ADA' : 'BELUM ADA'}
                           </td>
                           <td className="p-2 italic text-slate-600">
-                            <div className="flex items-center justify-between gap-2">
-                              <span>{report.adArtPdfName ? `Berkas: ${report.adArtPdfName}` : '-'}</span>
-                              {report.adArtPdfUrl && (
-                                <a
-                                  href={report.adArtPdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download={report.adArtPdfName || 'AD_ART_BUMDes'}
-                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
-                                  title="Unduh AD/ART"
-                                >
-                                  <Download className="w-3 h-3" /> Unduh
-                                </a>
-                              )}
-                            </div>
+                            <span>{report.adArtPdfName ? `Berkas: ${report.adArtPdfName}` : '-'}</span>
                           </td>
                         </tr>
                         <tr className="border-b border-slate-300 bg-slate-50/50">
@@ -352,21 +310,7 @@ export default function PrintBumdesMonevModal({
                             {report.hasSkPengelola ? 'ADA' : 'BELUM ADA'}
                           </td>
                           <td className="p-2 italic text-slate-600">
-                            <div className="flex items-center justify-between gap-2">
-                              <span>{report.skPengelolaPdfName ? `Berkas: ${report.skPengelolaPdfName}` : '-'}</span>
-                              {report.skPengelolaPdfUrl && (
-                                <a
-                                  href={report.skPengelolaPdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download={report.skPengelolaPdfName || 'SK_Pengelola'}
-                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
-                                  title="Unduh SK Pengelola"
-                                >
-                                  <Download className="w-3 h-3" /> Unduh
-                                </a>
-                              )}
-                            </div>
+                            <span>{report.skPengelolaPdfName ? `Berkas: ${report.skPengelolaPdfName}` : '-'}</span>
                           </td>
                         </tr>
                         <tr className="border-b border-slate-300">
@@ -375,21 +319,7 @@ export default function PrintBumdesMonevModal({
                             <span className="font-semibold">{report.musdesDate ? `Dilaksanakan (${report.musdesDate})` : 'BELUM LAPOR'}</span>
                           </td>
                           <td className="p-2 italic text-slate-600">
-                            <div className="flex items-center justify-between gap-2">
-                              <span>{report.musdesBaPdfName ? `Berita Acara: ${report.musdesBaPdfName}` : '-'}</span>
-                              {report.musdesBaPdfUrl && (
-                                <a
-                                  href={report.musdesBaPdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download={report.musdesBaPdfName || 'Berita_Acara_Musdes'}
-                                  className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0 not-italic"
-                                  title="Unduh Berita Acara Musdes"
-                                >
-                                  <Download className="w-3 h-3" /> Unduh
-                                </a>
-                              )}
-                            </div>
+                            <span>{report.musdesBaPdfName ? `Berita Acara: ${report.musdesBaPdfName}` : '-'}</span>
                           </td>
                         </tr>
                       </tbody>
@@ -403,35 +333,11 @@ export default function PrintBumdesMonevModal({
                     </h4>
                     
                     <div className="mb-2 grid grid-cols-2 gap-2 text-[11px] bg-slate-50 border border-slate-300 p-2 rounded">
-                      <div className="flex items-center justify-between gap-2">
+                      <div>
                         <span><strong>Dokumen RKT:</strong> {report.rktDocName ? `📄 ${report.rktDocName}` : 'Belum diunggah oleh Desa'}</span>
-                        {report.rktDocUrl && (
-                          <a
-                            href={report.rktDocUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download={report.rktDocName || 'Dokumen_RKT_Unggahan_Desa'}
-                            className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
-                            title="Unduh Dokumen RKT Hasil Unggahan Desa"
-                          >
-                            <Download className="w-3 h-3" /> Unduh RKT Unggahan Desa
-                          </a>
-                        )}
                       </div>
-                      <div className="flex items-center justify-between gap-2">
+                      <div>
                         <span><strong>Dokumen RAB:</strong> {report.rabDocName ? `📄 ${report.rabDocName}` : 'Belum diunggah oleh Desa'}</span>
-                        {report.rabDocUrl && (
-                          <a
-                            href={report.rabDocUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download={report.rabDocName || 'Dokumen_RAB_Unggahan_Desa'}
-                            className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
-                            title="Unduh Dokumen RAB Hasil Unggahan Desa"
-                          >
-                            <Download className="w-3 h-3" /> Unduh RAB Unggahan Desa
-                          </a>
-                        )}
                       </div>
                     </div>
 
@@ -476,35 +382,11 @@ export default function PrintBumdesMonevModal({
                     <p className="font-bold text-[11px] text-slate-800 mb-1.5 uppercase">4.1 Ringkasan Finansial Makro & Dokumen Penyertaan Modal</p>
                     
                     <div className="mb-2.5 grid grid-cols-2 gap-2 text-[11px] bg-slate-50 border border-slate-300 p-2 rounded">
-                      <div className="flex items-center justify-between gap-2">
+                      <div>
                         <span><strong>Analisa Kelayakan Modal:</strong> {report.feasibilityStudyPdfName ? `📄 ${report.feasibilityStudyPdfName}` : 'Belum diunggah oleh Desa'}</span>
-                        {report.feasibilityStudyPdfUrl && (
-                          <a
-                            href={report.feasibilityStudyPdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download={report.feasibilityStudyPdfName || 'Dokumen_Analisa_Kelayakan'}
-                            className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
-                            title="Unduh Dokumen Analisa Kelayakan Modal"
-                          >
-                            <Download className="w-3 h-3" /> Unduh
-                          </a>
-                        )}
                       </div>
-                      <div className="flex items-center justify-between gap-2">
+                      <div>
                         <span><strong>Perdes Penyertaan Modal ({report.year}):</strong> {(report.perdesCapitalPdfName || report.skCapitalPdfName) ? `📄 ${report.perdesCapitalPdfName || report.skCapitalPdfName}` : 'Belum diunggah oleh Desa'}</span>
-                        {(report.perdesCapitalPdfUrl || report.skCapitalPdfUrl) && (
-                          <a
-                            href={report.perdesCapitalPdfUrl || report.skCapitalPdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download={report.perdesCapitalPdfName || report.skCapitalPdfName || 'Perdes_Penyertaan_Modal'}
-                            className="print:hidden print:!hidden no-print inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-2 py-0.5 rounded shadow-2xs transition-colors shrink-0"
-                            title="Unduh Perdes Penyertaan Modal"
-                          >
-                            <Download className="w-3 h-3" /> Unduh
-                          </a>
-                        )}
                       </div>
                     </div>
                     <table className="w-full text-left border border-slate-300 mb-3 text-[10.5px]">
@@ -684,18 +566,8 @@ export default function PrintBumdesMonevModal({
                               alt={`Dokumentasi Musdes ${idx + 1}`} 
                               className="w-full h-24 object-cover rounded border border-slate-200"
                             />
-                            <div className="flex items-center justify-between px-0.5">
+                            <div className="text-center px-0.5">
                               <span className="text-[9px] font-bold text-slate-700">Dokumentasi #{idx + 1}</span>
-                              <a
-                                href={photoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download={`Foto_Musdes_${idx + 1}.jpg`}
-                                className="print:hidden print:!hidden no-print inline-flex items-center gap-0.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[8px] px-1.5 py-0.5 rounded shadow-2xs transition-colors"
-                                title="Unduh Foto Musdes"
-                              >
-                                <Download className="w-2.5 h-2.5" /> Unduh
-                              </a>
                             </div>
                           </div>
                         ))}
