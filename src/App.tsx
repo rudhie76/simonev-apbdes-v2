@@ -345,7 +345,13 @@ export default function App() {
         const reg = JSON.parse(savedReg);
         if (Array.isArray(reg)) {
           reg.forEach((r: any) => {
-            const idx = combined.findIndex(c => c.id === r.id || c.username.toLowerCase() === r.username.toLowerCase());
+            if (!r) return;
+            const rUser = r.username ? String(r.username).toLowerCase() : '';
+            const idx = combined.findIndex(c => {
+              if (!c) return false;
+              const cUser = c.username ? String(c.username).toLowerCase() : '';
+              return (c.id && r.id && c.id === r.id) || (cUser && rUser && cUser === rUser);
+            });
             if (idx >= 0) {
               combined[idx] = { ...combined[idx], ...r };
             } else {
