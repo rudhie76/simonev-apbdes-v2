@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Activity, BumdesMonev, Village, parseMusdesPhotos } from '../types';
-import { Printer, X, Filter, Building2, Calendar, ShieldCheck, FileText, Briefcase, Award, TrendingUp, Download, Coins, CheckCircle2 } from 'lucide-react';
+import { Printer, X, Filter, Building2, Calendar, ShieldCheck, FileText, FileCheck, Briefcase, Award, TrendingUp, Download, Coins, CheckCircle2 } from 'lucide-react';
 import { LOGO_BASE64 } from '../assets/logoBase64';
 
 export type MonevPeriodType = 
