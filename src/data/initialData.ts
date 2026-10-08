@@ -459,6 +459,91 @@ export const INITIAL_BUMDES_MONEV: BumdesMonev[] = [
     followUpRecommendation: 'Lakukan Musyawarah Desa khusus untuk merestrukturisasi kepengurusan BUMDes dan lakukan studi kelayakan unit usaha baru sebelum memulai kembali.',
     reviewedBy: 'Bpk. Siswanto (Kasi PMD)',
     reviewedAt: '2026-07-12T16:00:00Z'
+  },
+  {
+    id: 'Bangun Mulya_2027',
+    village: 'Bangun Mulya',
+    year: 2027,
+    lastUpdated: '2027-01-10T12:00:00Z',
+    bumdesName: 'BUMDes Karya Mandiri',
+    establishedYear: 2018,
+    directorName: 'Sudirman, S.H.',
+    lawStatus: 'Sudah Terbit',
+    certificatePdfName: 'SERTIFIKAT_KEMENKUMHAM_BM_2027.pdf',
+    certificatePdfUrl: 'simulation_pdf_url',
+    hasPerdesPendirian: true,
+    perdesPdfName: 'PERDES_PENDIRIAN_BUMDES_BM_2027.pdf',
+    perdesPdfUrl: 'simulation_pdf_url',
+    hasAdArt: true,
+    adArtPdfName: 'AD_ART_BUMDES_BM_2027.pdf',
+    adArtPdfUrl: 'simulation_pdf_url',
+    hasSkPengelola: true,
+    skPengelolaPdfName: 'SK_PENGELOLA_BUMDES_BM_2027.pdf',
+    skPengelolaPdfUrl: 'simulation_pdf_url',
+    musdesDate: '2027-01-20',
+    musdesBaPdfName: 'BA_MUSDES_LPJ_BM_2026.pdf',
+    musdesBaPdfUrl: 'simulation_pdf_url',
+    rktDocName: 'RKT_BUMDES_BANGUN_MULYA_2027.pdf',
+    rktDocUrl: 'simulation_pdf_url',
+    rabDocName: 'RAB_OPERASIONAL_2027.pdf',
+    rabDocUrl: 'simulation_pdf_url',
+    feasibilityStudyPdfName: 'ANALISA_KELAYAKAN_MODAL_BM_2027.pdf',
+    feasibilityStudyPdfUrl: 'simulation_pdf_url',
+    perdesCapitalPdfName: 'PERDES_PENYERTAAN_MODAL_BM_2027.pdf',
+    perdesCapitalPdfUrl: 'simulation_pdf_url',
+    workPlans: [
+      {
+        id: 'wp-bm-2027-1',
+        programName: 'Pengembangan Unit Usaha Pengolahan Hasil Tani Desa',
+        targetDescription: 'Pembelian 1 Unit Mesin Pengering Gabah & Packaging',
+        rabBudget: 75000000,
+        realizationAmount: 75000000,
+        status: 'Tercapai',
+        notes: 'Selesai dan membantu petani lokal'
+      }
+    ],
+    capitalParticipation: 200000000,
+    capitalParticipationPrevYear: 150000000,
+    capitalParticipationCurrentYear: 50000000,
+
+    totalAssets: 350000000,
+    totalAssetsPrevYear: 285000000,
+    totalAssetsCurrentYear: 65000000,
+
+    totalRevenue: 150000000,
+    totalRevenuePrevYear: 120000000,
+    totalRevenueCurrentYear: 30000000,
+
+    netProfit: 60000000,
+    netProfitPrevYear: 45000000,
+    netProfitCurrentYear: 15000000,
+
+    padesContribution: 20000000,
+    padesContributionPrevYear: 15000000,
+    padesContributionCurrentYear: 5000000,
+    units: [
+      {
+        id: 'unit-bm-1',
+        name: 'Pengelolaan Air Bersih (Pamsimas)',
+        status: 'Aktif Beroperasi',
+        financialCondition: 'Untung',
+        mainConstraint: 'Manajemen'
+      },
+      {
+        id: 'unit-bm-2',
+        name: 'Unit Jasa Penyewaan Alat Pesta',
+        status: 'Aktif Beroperasi',
+        financialCondition: 'Untung',
+        mainConstraint: 'Modal'
+      }
+    ],
+    totalEmployees: 9,
+    localEmployees: 9,
+    assistedUmkm: 7,
+    verificationNotes: 'Laporan Monev BUMDes TA 2027 berjalan dengan peningkatan unit pengolahan hasil tani.',
+    healthScore: 'Sehat/Berkembang',
+    followUpRecommendation: 'Pertahankan kinerja keuangan dan tingkatkan kontribusi PADes.',
+    reviewedBy: 'Bpk. Siswanto (Kasi PMD)'
   }
 ];
 

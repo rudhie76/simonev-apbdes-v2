@@ -252,23 +252,27 @@ export default function BumdesMonevBoard({
       setHealthScore(report.healthScore || 'Dasar/Perlu Perhatian');
       setFollowUpRecommendation(report.followUpRecommendation || '');
     } else {
-      // Clean slate default state
+      // Look up existing report for this village from another year to inherit static BUMDes identity profile
+      const prevVillageReport = bumdesList.find(b => b.village === selectedVillage);
+
       setActiveReport(null);
-      setBumdesName('');
-      setEstablishedYear('');
-      setDirectorName('');
-      setLawStatus('Belum');
+      setBumdesName(prevVillageReport?.bumdesName || '');
+      setEstablishedYear(prevVillageReport?.establishedYear ? String(prevVillageReport.establishedYear) : '');
+      setDirectorName(prevVillageReport?.directorName || '');
+      setLawStatus(prevVillageReport?.lawStatus || 'Belum');
       setCertificatePdfName('');
       setCertificatePdfUrl('');
-      setHasPerdesPendirian(false);
+      setHasPerdesPendirian(!!prevVillageReport?.hasPerdesPendirian);
       setPerdesPdfName('');
       setPerdesPdfUrl('');
-      setHasAdArt(false);
+      setHasAdArt(!!prevVillageReport?.hasAdArt);
       setAdArtPdfName('');
       setAdArtPdfUrl('');
-      setHasSkPengelola(false);
+      setHasSkPengelola(!!prevVillageReport?.hasSkPengelola);
       setSkPengelolaPdfName('');
       setSkPengelolaPdfUrl('');
+
+      // Fresh annual files & data for selected year
       setMusdesDate('');
       setMusdesBaPdfName('');
       setMusdesBaPdfUrl('');
@@ -282,7 +286,7 @@ export default function BumdesMonevBoard({
       setRabDocUrl('');
       setWorkPlans([]);
 
-      setAssetItems([]);
+      setAssetItems(prevVillageReport?.assetItems || []);
 
       setCapitalParticipationPrevYear(0);
       setCapitalParticipationCurrentYear(0);
@@ -582,11 +586,23 @@ export default function BumdesMonevBoard({
         }
       }
 
-      setName(fileToUpload.name);
+      // Ensure filename clearly includes year suffix (e.g., XX_2026.pdf or XX_2027.pdf)
+      let formattedName = fileToUpload.name;
+      const yearStr = String(selectedYear);
+      if (!formattedName.includes(yearStr)) {
+        const dotIndex = formattedName.lastIndexOf('.');
+        if (dotIndex !== -1) {
+          formattedName = `${formattedName.substring(0, dotIndex)}_${yearStr}${formattedName.substring(dotIndex)}`;
+        } else {
+          formattedName = `${formattedName}_${yearStr}`;
+        }
+      }
+
+      setName(formattedName);
       let uploadedUrl = '';
 
       try {
-        const downloadUrl = await uploadFileToStorage(fileToUpload, 'bumdes_monev');
+        const downloadUrl = await uploadFileToStorage(fileToUpload, `bumdes_monev_${selectedYear}`);
         setUrl(downloadUrl);
         uploadedUrl = downloadUrl;
       } catch (err) {
@@ -621,40 +637,52 @@ export default function BumdesMonevBoard({
       if (uploadedUrl) {
         const overrides: Partial<BumdesMonev> = {};
         if (fieldKey === 'cert') {
-          overrides.certificatePdfName = fileToUpload.name;
+          overrides.certificatePdfName = formattedName;
           overrides.certificatePdfUrl = uploadedUrl;
-          setCertificatePdfName(fileToUpload.name);
+          setCertificatePdfName(formattedName);
           setCertificatePdfUrl(uploadedUrl);
         } else if (fieldKey === 'perdes') {
-          overrides.perdesPdfName = fileToUpload.name;
+          overrides.perdesPdfName = formattedName;
           overrides.perdesPdfUrl = uploadedUrl;
-          setPerdesPdfName(fileToUpload.name);
+          setPerdesPdfName(formattedName);
           setPerdesPdfUrl(uploadedUrl);
         } else if (fieldKey === 'adart') {
-          overrides.adArtPdfName = fileToUpload.name;
+          overrides.adArtPdfName = formattedName;
           overrides.adArtPdfUrl = uploadedUrl;
-          setAdArtPdfName(fileToUpload.name);
+          setAdArtPdfName(formattedName);
           setAdArtPdfUrl(uploadedUrl);
         } else if (fieldKey === 'sk') {
-          overrides.skPengelolaPdfName = fileToUpload.name;
+          overrides.skPengelolaPdfName = formattedName;
           overrides.skPengelolaPdfUrl = uploadedUrl;
-          setSkPengelolaPdfName(fileToUpload.name);
+          setSkPengelolaPdfName(formattedName);
           setSkPengelolaPdfUrl(uploadedUrl);
         } else if (fieldKey === 'musdes_ba') {
-          overrides.musdesBaPdfName = fileToUpload.name;
+          overrides.musdesBaPdfName = formattedName;
           overrides.musdesBaPdfUrl = uploadedUrl;
-          setMusdesBaPdfName(fileToUpload.name);
+          setMusdesBaPdfName(formattedName);
           setMusdesBaPdfUrl(uploadedUrl);
         } else if (fieldKey === 'rkt_doc') {
-          overrides.rktDocName = fileToUpload.name;
+          overrides.rktDocName = formattedName;
           overrides.rktDocUrl = uploadedUrl;
-          setRktDocName(fileToUpload.name);
+          setRktDocName(formattedName);
           setRktDocUrl(uploadedUrl);
-        } else if (fieldKey === 'rab_doc') {
-          overrides.rabDocName = fileToUpload.name;
+        } else if (fieldKey === 'rabDoc') {
+          overrides.rabDocName = formattedName;
           overrides.rabDocUrl = uploadedUrl;
-          setRabDocName(fileToUpload.name);
+          setRabDocName(formattedName);
           setRabDocUrl(uploadedUrl);
+        } else if (fieldKey === 'feasibility_study') {
+          overrides.feasibilityStudyPdfName = formattedName;
+          overrides.feasibilityStudyPdfUrl = uploadedUrl;
+          setFeasibilityStudyPdfName(formattedName);
+          setFeasibilityStudyPdfUrl(uploadedUrl);
+        } else if (fieldKey === 'perdes_capital') {
+          overrides.perdesCapitalPdfName = formattedName;
+          overrides.perdesCapitalPdfUrl = uploadedUrl;
+          overrides.skCapitalPdfName = formattedName;
+          overrides.skCapitalPdfUrl = uploadedUrl;
+          setPerdesCapitalPdfName(formattedName);
+          setPerdesCapitalPdfUrl(uploadedUrl);
         }
         await autoSaveWithOverrides(overrides);
       }
