@@ -35,6 +35,7 @@ import RegulationsBoard from './components/RegulationsBoard';
 import LoginPortal from './components/LoginPortal';
 import PrintReportModal from './components/PrintReportModal';
 import PrintProposalModal from './components/PrintProposalModal';
+import PrintKecamatanMonevModal from './components/PrintKecamatanMonevModal';
 import BumdesMonevBoard from './components/BumdesMonevBoard';
 import UserManagementModal from './components/UserManagementModal';
 import logoPpu from './assets/logo.png';
@@ -325,6 +326,7 @@ export default function App() {
   // Print status state for the printable summary report
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
+  const [isKecamatanMonevModalOpen, setIsKecamatanMonevModalOpen] = useState(false);
   const [printModalVillageFilter, setPrintModalVillageFilter] = useState<Village | 'ALL'>('ALL');
 
   // Users state & User verification modal
@@ -1580,6 +1582,16 @@ export default function App() {
                 <p className="text-[9px] text-slate-400 uppercase font-bold leading-none">Terakhir Sinkronisasi</p>
                 <p className="text-xs font-bold text-slate-700 mt-1">Hari Ini, Real-time WIB</p>
               </div>
+              {activeRole === 'OP_KECAMATAN' && (
+                <button
+                  onClick={() => setIsKecamatanMonevModalOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border border-blue-700 active:scale-95"
+                  title="Cetak Laporan Hasil Monev Kecamatan (Triwulan / Semester)"
+                >
+                  <Printer className="w-3.5 h-3.5 text-blue-100" />
+                  <span className="hidden lg:inline">Laporan Monev Kec. (Triwulan/Semester)</span>
+                </button>
+              )}
               {activeRole !== 'PUBLIC' && (
                 <button
                   onClick={() => setIsUserModalOpen(true)}
@@ -1699,6 +1711,9 @@ export default function App() {
                   }}
                   onTriggerPrintProposal={() => {
                     setIsProposalModalOpen(true);
+                  }}
+                  onTriggerPrintKecamatanMonev={() => {
+                    setIsKecamatanMonevModalOpen(true);
                   }}
                 />
               ) : (
@@ -1894,6 +1909,16 @@ export default function App() {
         isOpen={isProposalModalOpen}
         onClose={() => setIsProposalModalOpen(false)}
         activities={filteredActivitiesByYear}
+        villageBudgets={villageBudgets}
+        selectedYear={selectedYear}
+      />
+
+      {/* Print-ready Official Kecamatan Monev (Semester / Triwulan) Modal Overlay */}
+      <PrintKecamatanMonevModal
+        isOpen={isKecamatanMonevModalOpen}
+        onClose={() => setIsKecamatanMonevModalOpen(false)}
+        activities={filteredActivitiesByYear}
+        bumdesList={bumdesMonevList}
         villageBudgets={villageBudgets}
         selectedYear={selectedYear}
       />

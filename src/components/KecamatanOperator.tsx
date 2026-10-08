@@ -32,6 +32,7 @@ interface KecamatanOperatorProps {
   onSetEvaluation: (id: string, recommendation: string, approve: boolean, officerName: string) => void;
   onTriggerPrintRecap?: () => void;
   onTriggerPrintProposal?: () => void;
+  onTriggerPrintKecamatanMonev?: () => void;
 }
 
 function SafeThumbnail({ photo, title, onClick }: { photo: string; title: string; onClick: () => void }) {
@@ -68,7 +69,8 @@ export default function KecamatanOperator({
   activities, 
   onSetEvaluation,
   onTriggerPrintRecap,
-  onTriggerPrintProposal
+  onTriggerPrintProposal,
+  onTriggerPrintKecamatanMonev
 }: KecamatanOperatorProps) {
   const [selectedVillage, setSelectedVillage] = useState<Village | 'ALL'>('ALL');
   const [activeTab, setActiveTab] = useState<'PENDING' | 'APPROVED' | 'PROCESS' | 'ALL'>('PENDING');
@@ -331,12 +333,21 @@ export default function KecamatanOperator({
 
           <div className="flex flex-wrap items-center gap-2">
             <button
+              onClick={onTriggerPrintKecamatanMonev}
+              className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs rounded-lg transition-all border border-blue-700 cursor-pointer shadow-sm active:scale-95"
+              type="button"
+              title="Cetak Laporan Hasil Monev Kecamatan Per Triwulan atau Per Semester"
+            >
+              <Printer className="w-4 h-4 text-blue-100" />
+              Cetak Laporan Monev Kec. (Triwulan / Semester)
+            </button>
+            <button
               onClick={onTriggerPrintRecap}
-              className="flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-lg transition-all border border-slate-300 cursor-pointer shadow-xs active:scale-95"
+              className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-lg transition-all border border-slate-300 cursor-pointer shadow-xs active:scale-95"
               type="button"
             >
               <Printer className="w-4 h-4 text-slate-600" />
-              Cetak Laporan Verifikasi Kec.
+              Rekap Verifikasi
             </button>
             <select
               value={selectedVillage}
