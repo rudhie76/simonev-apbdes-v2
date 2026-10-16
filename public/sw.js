@@ -1,11 +1,14 @@
 // Service Worker for SIMONEV APBDes Desktop & Mobile PWA Installation
-const CACHE_NAME = 'simonev-apbdes-v2-cache';
+const CACHE_NAME = 'simonev-apbdes-v3-cache';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './logo.png',
-  './favicon.png'
+  './favicon.png',
+  './favicon.ico',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // Install Event
