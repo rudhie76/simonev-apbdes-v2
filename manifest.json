@@ -1,7 +1,10 @@
 {
   "short_name": "SIMONEV APBDes",
   "name": "SIMONEV APBDes Waru - Penajam Paser Utara",
+  "description": "Sistem Informasi Monitoring dan Evaluasi APBDes Kecamatan Waru, Kabupaten Penajam Paser Utara",
+  "id": "/simonev-apbdes-v2/",
   "start_url": "./index.html",
+  "scope": "./",
   "background_color": "#0f172a",
   "theme_color": "#2563eb",
   "display": "standalone",
@@ -23,13 +26,18 @@
       "src": "./logo.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "./favicon.png",
       "type": "image/png",
       "sizes": "64x64",
       "purpose": "any"
+    },
+    {
+      "src": "./favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "64x64 32x32 16x16"
     }
   ]
 }
