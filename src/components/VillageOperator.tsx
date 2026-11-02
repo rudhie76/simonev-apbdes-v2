@@ -127,7 +127,8 @@ const SECTORS: Sector[] = [
   'Pembangunan Desa (Non Infrastruktur)',
   'Pembinaan Kemasyarakatan',
   'Pemberdayaan Masyarakat',
-  'Penanggulangan Bencana & Mendesak'
+  'Penanggulangan Bencana & Mendesak',
+  'Tangguh RT'
 ];
 
 export const SOURCES_OF_FUNDS: SourceOfFunds[] = [
@@ -855,6 +856,7 @@ export default function VillageOperator({
               <option value="Pembinaan Kemasyarakatan">Pembinaan Kemasyarakatan</option>
               <option value="Pemberdayaan Masyarakat">Pemberdayaan Masyarakat</option>
               <option value="Penanggulangan Bencana & Mendesak">Kebencanaan & Mendesak</option>
+              <option value="Tangguh RT">Tangguh RT</option>
             </select>
             <Filter className="w-3.5 h-3.5 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>

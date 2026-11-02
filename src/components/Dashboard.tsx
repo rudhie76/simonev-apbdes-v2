@@ -1095,6 +1095,7 @@ export default function Dashboard({
                 <option value="Pembinaan Kemasyarakatan">Pembinaan Kemasyarakatan</option>
                 <option value="Pemberdayaan Masyarakat">Pemberdayaan Masyarakat</option>
                 <option value="Penanggulangan Bencana & Mendesak">Kebencanaan & Mendesak</option>
+                <option value="Tangguh RT">Tangguh RT</option>
               </select>
               <Filter className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>

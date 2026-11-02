@@ -310,6 +310,7 @@ export default function PrintReportModal({
                 <option value="Pembinaan Kemasyarakatan">Pembinaan Kemasyarakatan</option>
                 <option value="Pemberdayaan Masyarakat">Pemberdayaan Masyarakat</option>
                 <option value="Penanggulangan Bencana & Mendesak">Kebencanaan & Mendesak</option>
+                <option value="Tangguh RT">Tangguh RT</option>
               </select>
             </div>
 

@@ -11,7 +11,8 @@ export type Sector =
   | 'Pembangunan Desa (Non Infrastruktur)'
   | 'Pembinaan Kemasyarakatan'
   | 'Pemberdayaan Masyarakat'
-  | 'Penanggulangan Bencana & Mendesak';
+  | 'Penanggulangan Bencana & Mendesak'
+  | 'Tangguh RT';
 
 export type ActivityStatus = 'BELUM_MULAI' | 'DALAM_PROSES' | 'MENUNGGU_EVALUASI' | 'SELESAI';
 
