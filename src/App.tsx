@@ -751,7 +751,7 @@ export default function App() {
   };
 
   // A. Add Activity (Village Level)
-  const handleAddActivity = async (newActData: Omit<Activity, 'id' | 'createdAt' | 'lastUpdated' | 'isKecamatanApproved'>) => {
+  const handleAddActivity = async (newActData: Omit<Activity, 'id' | 'createdAt' | 'lastUpdated' | 'isKecamatanApproved'> & { createdAt?: string }) => {
     const actId = `act-${Date.now()}`;
     
     const initialHistory: IncompleteReasonHistoryEntry[] = [];
@@ -764,10 +764,11 @@ export default function App() {
       });
     }
 
+    const inputDate = newActData.createdAt || new Date().toISOString();
     const newAct: Activity = {
       ...newActData,
       id: actId,
-      createdAt: new Date().toISOString(),
+      createdAt: inputDate,
       lastUpdated: new Date().toISOString(),
       isKecamatanApproved: false,
       incompleteReasonsHistory: initialHistory.length > 0 ? initialHistory : undefined

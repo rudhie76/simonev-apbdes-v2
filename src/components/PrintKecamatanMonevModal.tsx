@@ -106,20 +106,24 @@ export default function PrintKecamatanMonevModal({
   // Filtered Activities
   const filteredActivities = useMemo(() => {
     return activities.filter((act) => {
-      const actYear = act.year || (act.lastUpdated ? new Date(act.lastUpdated).getFullYear() : currentYear);
+      const actDateStr = act.createdAt || act.lastUpdated;
+      const d = actDateStr ? new Date(actDateStr) : null;
+      const actYear = act.year || (d && !isNaN(d.getTime()) ? d.getFullYear() : currentYear);
       if (actYear !== currentYear) return false;
 
       if (selectedVillage !== 'ALL' && act.village !== selectedVillage) return false;
 
-      // Period filter check based on month
-      const actDateStr = act.lastUpdated || act.createdAt;
-      if (actDateStr && periodType !== 'TAHUNAN') {
-        const d = new Date(actDateStr);
-        if (!isNaN(d.getTime())) {
-          const m = d.getMonth();
-          if (m < periodMonthRange.startMonth || m > periodMonthRange.endMonth) {
-            // Include if explicitly approved in this period or matching bounds
-          }
+      // Period filter check based on month of input
+      if (periodType !== 'TAHUNAN') {
+        if (!d || isNaN(d.getTime())) {
+          return false;
+        }
+        if (d.getFullYear() !== currentYear) {
+          return false;
+        }
+        const m = d.getMonth();
+        if (m < periodMonthRange.startMonth || m > periodMonthRange.endMonth) {
+          return false;
         }
       }
 

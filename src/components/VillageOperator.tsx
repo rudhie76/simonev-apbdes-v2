@@ -114,7 +114,7 @@ const compressImageFile = (
 interface VillageOperatorProps {
   village: Village;
   activities: Activity[];
-  onAddActivity: (activity: Omit<Activity, 'id' | 'createdAt' | 'lastUpdated' | 'isKecamatanApproved'>) => void;
+  onAddActivity: (activity: Omit<Activity, 'id' | 'createdAt' | 'lastUpdated' | 'isKecamatanApproved'> & { createdAt?: string }) => void;
   onUpdateActivity: (id: string, updates: Partial<Activity>) => void;
   onDeleteActivity: (id: string) => void;
   onTriggerPrintRecap?: () => void;
@@ -183,6 +183,7 @@ export default function VillageOperator({
 
   // Form State for Adding / Editing
   const [newName, setNewName] = useState('');
+  const [newDate, setNewDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
   const [newSector, setNewSector] = useState<Sector>('Pembangunan Desa (Infrastruktur)');
   const [newSourceOfFunds, setNewSourceOfFunds] = useState<SourceOfFunds>('Dana Desa (DD)');
   const [newBudgetTotal, setNewBudgetTotal] = useState(0);
@@ -210,6 +211,7 @@ export default function VillageOperator({
   const [editReportName, setEditReportName] = useState<string>('');
   const [editSourceOfFunds, setEditSourceOfFunds] = useState<SourceOfFunds>('Dana Desa (DD)');
   const [editSector, setEditSector] = useState<Sector>('Pembangunan Desa (Infrastruktur)');
+  const [editCreatedAt, setEditCreatedAt] = useState<string>('');
 
   // Filter state variables matching the requested photo
   const [selectedSector, setSelectedSector] = useState<Sector | 'ALL'>('ALL');
@@ -440,11 +442,13 @@ export default function VillageOperator({
       budgetReportUrl: newReport || undefined,
       budgetReportName: newReportName || undefined,
       incompleteReason: newProgressPhysical < 100 ? newIncompleteReason : undefined,
-      year: selectedYear
+      year: selectedYear,
+      createdAt: newDate ? new Date(newDate + 'T12:00:00Z').toISOString() : new Date().toISOString()
     });
 
     // Reset Form
     setNewName('');
+    setNewDate(new Date().toISOString().split('T')[0]);
     setNewSector('Pembangunan Desa (Infrastruktur)');
     setNewSourceOfFunds('Dana Desa (DD)');
     setNewBudgetTotal(0);
@@ -470,6 +474,8 @@ export default function VillageOperator({
     setEditReportName(act.budgetReportName || '');
     setEditSourceOfFunds(act.sourceOfFunds || 'Dana Desa (DD)');
     setEditSector(act.sector);
+    const dStr = act.createdAt ? act.createdAt.split('T')[0] : (act.lastUpdated ? act.lastUpdated.split('T')[0] : '');
+    setEditCreatedAt(dStr);
     setCompressionFeedback(null);
   };
 
@@ -509,7 +515,8 @@ export default function VillageOperator({
       status,
       incompleteReason: editProgressPhysical < 100 ? editIncompleteReason : (act.incompleteReason || ''),
       // If modified, clean kecamatan approved until re-evaluated
-      isKecamatanApproved: false
+      isKecamatanApproved: false,
+      createdAt: editCreatedAt ? new Date(editCreatedAt + 'T12:00:00Z').toISOString() : act.createdAt
     });
 
     setEditingId(null);
@@ -636,6 +643,18 @@ export default function VillageOperator({
                   <option key={source} value={source}>{source}</option>
                 ))}
               </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-700 uppercase">Tanggal Input / Pelaksanaan Kegiatan</label>
+              <input
+                type="date"
+                required
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+                className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500/10 font-mono font-semibold"
+              />
+              <p className="text-[10px] text-slate-400">Menentukan periode pelaporan: Triwulan I (Jan-Mar), II (Apr-Jun), III (Jul-Sep), IV (Okt-Des).</p>
             </div>
 
             <div className="space-y-2">
@@ -1268,6 +1287,17 @@ export default function VillageOperator({
                                 <option key={sector} value={sector}>{sector}</option>
                               ))}
                             </select>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-bold text-slate-600 block">TANGGAL INPUT / PELAKSANAAN</label>
+                            <input
+                              type="date"
+                              value={editCreatedAt}
+                              onChange={(e) => setEditCreatedAt(e.target.value)}
+                              className="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded font-mono font-bold"
+                            />
+                            <p className="text-[9px] text-slate-400">Menentukan periode triwulan/semester kegiatan ini.</p>
                           </div>
 
                           {/* Physical slider */}
